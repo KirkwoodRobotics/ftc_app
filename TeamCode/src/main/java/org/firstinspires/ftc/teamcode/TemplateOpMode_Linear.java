@@ -30,6 +30,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -50,13 +51,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Test Linear OpMode", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-public class TestOpMode_Linear extends LinearOpMode {
+@TeleOp(name="Template: Linear OpMode", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@Disabled
+public class TemplateOpMode_Linear extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-    Hardware robot = new Hardware();
-
+    static DcMotor leftMotor = null;
+    static DcMotor rightMotor = null;
     static final double INCREMENT   =  0.01;
     static final double MAX_POS     =  1.00;
     static final double MIN_POS     =  0.00;
@@ -68,13 +70,11 @@ public class TestOpMode_Linear extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        robot.init(hardwareMap);
-
         /* eg: Initialize the hardware variables. Note that the strings used here as parameters
          * to 'get' must correspond to the names assigned during the robot configuration
          * step (using the FTC Robot Controller app on the phone).
          */
-        //testMotor  = hardwareMap.dcMotor.get("test motor");
+        // leftMotor  = hardwareMap.dcMotor.get("left motor");
         // rightMotor = hardwareMap.dcMotor.get("right motor");
 
         // eg: Set the drive motor directions:
@@ -91,7 +91,8 @@ public class TestOpMode_Linear extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
 
-            //robot.testMotor.setPower(-gamepad1.left_stick_y);
+            // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
+            leftMotor.setPower(-gamepad1.left_stick_y);
 
             if (gamepad1.left_stick_y > 0 ) {
                 position += INCREMENT;
@@ -106,9 +107,49 @@ public class TestOpMode_Linear extends LinearOpMode {
                     position = MIN_POS;
                 }
             }
+            if (gamepad1.left_stick_x > 0 ) {
+                position += INCREMENT;
 
-            telemetry.addData("Status", "Position: " + position);
-            robot.testServo.setPosition(position);
+                if (position > MAX_POS) {
+                    position = MAX_POS;
+                }
+            } else if (gamepad1.left_stick_x < 0) {
+                position -= INCREMENT;
+
+                if (position < MIN_POS) {
+                    position = MIN_POS;
+                }
+            }
+
+            rightMotor.setPower(-gamepad1.right_stick_y);
+
+            if (gamepad1.right_stick_y > 0 ) {
+                position += INCREMENT;
+
+                if (position > MAX_POS) {
+                    position = MAX_POS;
+                }
+            } else if (gamepad1.right_stick_y < 0) {
+                position -= INCREMENT;
+
+                if (position < MIN_POS) {
+                    position = MIN_POS;
+                }
+            }
+            if (gamepad1.right_stick_x > 0 ) {
+                position += INCREMENT;
+
+                if (position > MAX_POS) {
+                    position = MAX_POS;
+                }
+            } else if (gamepad1.right_stick_y < 0) {
+                position -= INCREMENT;
+
+                if (position < MIN_POS) {
+                    position = MIN_POS;
+                }
+            }
+
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
