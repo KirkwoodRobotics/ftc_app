@@ -1,6 +1,7 @@
+package org.firstinspires.ftc.teamcode;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -57,10 +58,10 @@ public class Hardware
         hwMap = ahwMap;
 
         // Define and Initialize Motors
-        DcMotor FrontLeftMotor = hwMap.dcMotor.get("front left motor");
-        DcMotor FrontRightMotor = hwMap.dcMotor.get("front right motor");
-        DcMotor BackLeftMotor = hwMap.dcMotor.get("back left motor");
-        DcMotor BackRightMotor = hwMap.dcMotor.get("back right motor");
+        FrontLeftMotor = hwMap.dcMotor.get("frontLeft");
+        FrontRightMotor = hwMap.dcMotor.get("frontRight");
+        BackLeftMotor = hwMap.dcMotor.get("backLeft");
+        BackRightMotor = hwMap.dcMotor.get("backRight");
 
         // Set all motors to zero power
         FrontLeftMotor.setPower(0);

@@ -1,4 +1,4 @@
-/*
+package org.firstinspires.ftc.teamcode;/*
 Copyright (c) 2016 Robert Atkinson
 
 All rights reserved.
@@ -31,11 +31,11 @@ TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -50,18 +50,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Test Linear OpMode", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-public class TestOpMode_Linear extends LinearOpMode {
+@TeleOp(name="HoloDrive", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+public class HoloDrive extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     Hardware robot = new Hardware();
 
-    static final double INCREMENT   =  0.01;
-    static final double MAX_POS     =  1.00;
-    static final double MIN_POS     =  0.00;
-
-    double position = 0;
+    float FrontLeftPower = 0;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -70,18 +66,6 @@ public class TestOpMode_Linear extends LinearOpMode {
 
         robot.init(hardwareMap);
 
-        /* eg: Initialize the hardware variables. Note that the strings used here as parameters
-         * to 'get' must correspond to the names assigned during the robot configuration
-         * step (using the FTC Robot Controller app on the phone).
-         */
-        //testMotor  = hardwareMap.dcMotor.get("test motor");
-        // rightMotor = hardwareMap.dcMotor.get("right motor");
-
-        // eg: Set the drive motor directions:
-        // "Reverse" the motor that runs backwards when connected directly to the battery
-        // leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        // rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
-
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
@@ -89,28 +73,24 @@ public class TestOpMode_Linear extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.update();
 
-            //robot.testMotor.setPower(-gamepad1.left_stick_y);
+            FrontLeftPower = -gamepad1.left_stick_y - gamepad1.left_stick_x - gamepad1.right_stick_x;
+            float FrontRightPower = gamepad1.left_stick_y - gamepad1.left_stick_x - gamepad1.right_stick_x;
+            float BackLeftPower = gamepad1.left_stick_y + gamepad1.left_stick_x - gamepad1.right_stick_x;
+            float BackRightPower = -gamepad1.left_stick_y + gamepad1.left_stick_x - gamepad1.right_stick_x;
 
-            if (gamepad1.left_stick_y > 0 ) {
-                position += INCREMENT;
+            FrontLeftPower = Range.clip(FrontLeftPower, -1, 1);
+            FrontRightPower = Range.clip(FrontRightPower, -1, 1);
+            BackLeftPower = Range.clip(BackLeftPower, -1, 1);
+            BackRightPower = Range.clip(BackRightPower, -1, 1);
 
-                if (position > MAX_POS) {
-                    position = MAX_POS;
-                }
-            } else if (gamepad1.left_stick_y < 0) {
-                position -= INCREMENT;
-
-                if (position < MIN_POS) {
-                    position = MIN_POS;
-                }
-            }
-
-            telemetry.addData("Status", "Position: " + position);
-            robot.testServo.setPosition(position);
+            robot.FrontLeftMotor.setPower(-gamepad1.left_stick_y);
+            robot.FrontRightMotor.setPower(FrontRightPower);
+            robot.BackLeftMotor.setPower(BackLeftPower);
+            robot.BackRightMotor.setPower(BackRightPower);
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
+            telemetry.update();
         }
     }
 }
