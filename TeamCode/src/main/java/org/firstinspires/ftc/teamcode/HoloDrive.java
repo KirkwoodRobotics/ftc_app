@@ -57,8 +57,6 @@ public class HoloDrive extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     Hardware robot = new Hardware();
 
-    float FrontLeftPower = 0;
-
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "Initialized");
@@ -74,20 +72,35 @@ public class HoloDrive extends LinearOpMode {
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
 
-            FrontLeftPower = -gamepad1.left_stick_y - gamepad1.left_stick_x - gamepad1.right_stick_x;
-            float FrontRightPower = gamepad1.left_stick_y - gamepad1.left_stick_x - gamepad1.right_stick_x;
-            float BackLeftPower = gamepad1.left_stick_y + gamepad1.left_stick_x - gamepad1.right_stick_x;
-            float BackRightPower = -gamepad1.left_stick_y + gamepad1.left_stick_x - gamepad1.right_stick_x;
 
-            FrontLeftPower = Range.clip(FrontLeftPower, -1, 1);
-            FrontRightPower = Range.clip(FrontRightPower, -1, 1);
-            BackLeftPower = Range.clip(BackLeftPower, -1, 1);
-            BackRightPower = Range.clip(BackRightPower, -1, 1);
+            // HoloDrive
+            float gamepad1LeftY = -gamepad1.left_stick_y;
+            float gamepad1LeftX = gamepad1.left_stick_x;
+            float gamepad1RightX = gamepad1.right_stick_x;
 
-            robot.FrontLeftMotor.setPower(-gamepad1.left_stick_y);
-            robot.FrontRightMotor.setPower(FrontRightPower);
-            robot.BackLeftMotor.setPower(BackLeftPower);
-            robot.BackRightMotor.setPower(BackRightPower);
+            float frontLeftPower = -gamepad1LeftY - gamepad1LeftX - gamepad1RightX;
+            float frontRightPower = gamepad1LeftX - gamepad1LeftX - gamepad1RightX;
+            float backLeftPower = gamepad1LeftY + gamepad1LeftX - gamepad1RightX;
+            float backRightPower = -gamepad1LeftY + gamepad1LeftX - gamepad1RightX;
+
+            frontLeftPower = Range.clip(frontLeftPower, -1, 1);
+            frontRightPower = Range.clip(frontRightPower, -1, 1);
+            backLeftPower = Range.clip(backLeftPower, -1, 1);
+            backRightPower = Range.clip(backRightPower, -1, 1);
+
+            robot.frontLeftMotor.setPower(frontLeftPower);
+            robot.frontRightMotor.setPower(frontRightPower);
+            robot.backLeftMotor.setPower(backLeftPower);
+            robot.backRightMotor.setPower(backRightPower);
+
+
+            // arm
+            if (gamepad1.a) {
+                robot.arm.setPower(1);
+            } else {
+                robot.arm.setPower(0);
+            }
+
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
             telemetry.update();
