@@ -31,7 +31,7 @@ public class Hardware
 
     public DcMotor arm             = null;
 
-    /*public Servo    claw        = null;
+    /*public Servo    claw         = null;
 
     public final static double ARM_HOME = 0.2;
     public final static double CLAW_HOME = 0.2;

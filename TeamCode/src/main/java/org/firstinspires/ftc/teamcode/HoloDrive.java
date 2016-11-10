@@ -79,9 +79,9 @@ public class HoloDrive extends LinearOpMode {
             float gamepad1RightX = gamepad1.right_stick_x;
 
             float frontLeftPower = -gamepad1LeftY - gamepad1LeftX - gamepad1RightX;
-            float frontRightPower = gamepad1LeftX - gamepad1LeftX - gamepad1RightX;
-            float backLeftPower = gamepad1LeftY + gamepad1LeftX - gamepad1RightX;
-            float backRightPower = -gamepad1LeftY + gamepad1LeftX - gamepad1RightX;
+            float frontRightPower = gamepad1LeftY - gamepad1LeftX - gamepad1RightX;
+            float backLeftPower = -gamepad1LeftY + gamepad1LeftX - gamepad1RightX;
+            float backRightPower = gamepad1LeftY + gamepad1LeftX - gamepad1RightX; // bR doesn't drive unless robot is rotating
 
             frontLeftPower = Range.clip(frontLeftPower, -1, 1);
             frontRightPower = Range.clip(frontRightPower, -1, 1);
