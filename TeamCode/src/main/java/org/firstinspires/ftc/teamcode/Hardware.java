@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 /**
  * This is NOT an opmode.
@@ -84,6 +86,47 @@ public class Hardware
         arm.setPosition(ARM_HOME);
         claw.setPosition(CLAW_HOME);*/
     }
+
+    public void autoDrive(float gamepad1LeftY, float gamepad1LeftX, float gamepad1RightX)
+    {
+        float frontLeftPower = -gamepad1LeftY - gamepad1LeftX - gamepad1RightX;
+        float frontRightPower = gamepad1LeftY - gamepad1LeftX - gamepad1RightX;
+        float backLeftPower = -gamepad1LeftY + gamepad1LeftX - gamepad1RightX;
+        float backRightPower = gamepad1LeftY + gamepad1LeftX - gamepad1RightX;
+
+        frontLeftPower = Range.clip(frontLeftPower, -1, 1);
+        frontRightPower = Range.clip(frontRightPower, -1, 1);
+        backLeftPower = Range.clip(backLeftPower, -1, 1);
+        backRightPower = Range.clip(backRightPower, -1, 1);
+
+        frontLeftMotor.setPower(frontLeftPower);
+        frontRightMotor.setPower(frontRightPower);
+        backLeftMotor.setPower(backLeftPower);
+        backRightMotor.setPower(backRightPower);
+    }
+
+    public void teleDrive(Gamepad gamepad1)
+    {
+        float gamepad1LeftY = -gamepad1.left_stick_y;
+        float gamepad1LeftX = gamepad1.left_stick_x;
+        float gamepad1RightX = gamepad1.right_stick_x;
+
+        float frontLeftPower = -gamepad1LeftY - gamepad1LeftX - gamepad1RightX;
+        float frontRightPower = gamepad1LeftY - gamepad1LeftX - gamepad1RightX;
+        float backLeftPower = -gamepad1LeftY + gamepad1LeftX - gamepad1RightX;
+        float backRightPower = gamepad1LeftY + gamepad1LeftX - gamepad1RightX;
+
+        frontLeftPower = Range.clip(frontLeftPower, -1, 1);
+        frontRightPower = Range.clip(frontRightPower, -1, 1);
+        backLeftPower = Range.clip(backLeftPower, -1, 1);
+        backRightPower = Range.clip(backRightPower, -1, 1);
+
+        frontLeftMotor.setPower(frontLeftPower);
+        frontRightMotor.setPower(frontRightPower);
+        backLeftMotor.setPower(backLeftPower);
+        backRightMotor.setPower(backRightPower);
+    }
+
 
     /***
      *

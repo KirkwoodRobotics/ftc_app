@@ -33,7 +33,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -51,10 +50,9 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name="HoloDrive", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-public class HoloDrive extends LinearOpMode {
+public class AutoDrive extends LinearOpMode {
 
     /* Declare OpMode members. */
-    private ElapsedTime runtime = new ElapsedTime();
     Hardware robot = new Hardware();
 
     @Override
@@ -64,27 +62,15 @@ public class HoloDrive extends LinearOpMode {
 
         robot.init(hardwareMap);
 
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
-        runtime.reset();
+        waitForStart(); // Wait for the game to start (driver presses PLAY)
 
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
+        robot.autoDrive(1, 0, 0);
+        wait(800);
 
+        robot.autoDrive(0, -1, 0);
+        wait(1600);
 
-            robot.teleDrive(gamepad1);
-
-            // arm
-            if (gamepad1.a) {
-                robot.arm.setPower(1);
-            } else {
-                robot.arm.setPower(0);
-            }
-
-
-            idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
-            telemetry.update();
-        }
+        robot.autoDrive(0, 0, 1);
+        wait(300);
     }
 }
