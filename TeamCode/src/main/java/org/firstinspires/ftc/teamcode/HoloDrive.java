@@ -72,7 +72,6 @@ public class HoloDrive extends LinearOpMode {
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
 
-
             robot.teleDrive(gamepad1);
 
             // arm
@@ -82,6 +81,9 @@ public class HoloDrive extends LinearOpMode {
                 robot.arm.setPower(0);
             }
 
+            if (gamepad1.b) {
+                robot.arm.setPower(-0.5);
+            }
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
             telemetry.update();

@@ -87,7 +87,7 @@ public class Hardware
         claw.setPosition(CLAW_HOME);*/
     }
 
-    public void autoDrive(float gamepad1LeftY, float gamepad1LeftX, float gamepad1RightX)
+    public void autoDrive(float gamepad1LeftX, float gamepad1LeftY, float gamepad1RightX)
     {
         float frontLeftPower = -gamepad1LeftY - gamepad1LeftX - gamepad1RightX;
         float frontRightPower = gamepad1LeftY - gamepad1LeftX - gamepad1RightX;
@@ -109,7 +109,7 @@ public class Hardware
     {
         float gamepad1LeftY = -gamepad1.left_stick_y;
         float gamepad1LeftX = gamepad1.left_stick_x;
-        float gamepad1RightX = gamepad1.right_stick_x;
+        float gamepad1RightX = -gamepad1.right_stick_x; // reversed
 
         float frontLeftPower = -gamepad1LeftY - gamepad1LeftX - gamepad1RightX;
         float frontRightPower = gamepad1LeftY - gamepad1LeftX - gamepad1RightX;
@@ -127,6 +127,32 @@ public class Hardware
         backRightMotor.setPower(backRightPower);
     }
 
+    public void hAutoDrive(String dir, int periodMs) throws InterruptedException
+    {
+        switch (dir) {
+            case "forward":
+                autoDrive(0, 1, 0);
+                break;
+            case "backward":
+                autoDrive(0, -1, 0);
+                break;
+            case "right":
+                autoDrive(1, 0, 0);
+                break;
+            case "left":
+                autoDrive(-1, 0, 0);
+                break;
+            case "rotateClockwise":
+                autoDrive(0, 0, -1);
+                break;
+            default:
+                autoDrive(0, 0, 0);
+                break;
+        }
+
+        waitForTick(periodMs);
+        autoDrive(0, 0, 0);
+    }
 
     /***
      *
@@ -137,7 +163,7 @@ public class Hardware
      * @param periodMs  Length of wait cycle in mSec.
      * @throws InterruptedException
      */
-    public void waitForTick(long periodMs)  throws InterruptedException {
+    public void waitForTick(long periodMs) throws InterruptedException {
 
         long  remaining = periodMs - (long)period.milliseconds();
 
