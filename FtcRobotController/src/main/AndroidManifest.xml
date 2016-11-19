@@ -35,6 +35,8 @@
       android:name="com.qualcomm.ftccommon.FtcRobotControllerService"
       android:enabled="true" />
 
+    <uses-permission android:name="android.permission.CAMERA" android:required="true" />
+
   </application>
 
 </manifest>

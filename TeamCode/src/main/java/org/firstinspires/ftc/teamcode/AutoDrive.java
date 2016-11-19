@@ -50,7 +50,7 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="AutoDrive", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@Autonomous(name="AutoDrive", group="Linear Opmode")
 public class AutoDrive extends LinearOpMode {
 
     /* Declare OpMode members. */
@@ -67,9 +67,9 @@ public class AutoDrive extends LinearOpMode {
 
         // public void autoDrive(float gamepad1LeftX, float gamepad1LeftY, float gamepad1RightX)
 
-        robot.arm.setPower(0.3);
-        robot.hAutoDrive("forward", 2480);
-        robot.hAutoDrive("rotateClockwise", 700);
-        robot.hAutoDrive("forward", 2400);
+        //robot.arm.setPower(0.3);
+        robot.hAutoDrive("right", 3300); // start with battery side towards cap ball
+        //robot.hAutoDrive("rotateClockwise", 700);
+        //robot.hAutoDrive("forward", 2400);
     }
 }
