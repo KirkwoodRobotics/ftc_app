@@ -1,4 +1,6 @@
-package org.firstinspires.ftc.teamcode;/*
+package org.firstinspires.ftc.teamcode;
+
+/*
 Copyright (c) 2016 Robert Atkinson
 
 All rights reserved.
@@ -36,6 +38,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -71,6 +74,8 @@ public class HoloDrive extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
+
+            telemetry.addData("Status", ": " + robot.motorPower.printPower().toString());
 
             robot.teleDrive(gamepad1);
 

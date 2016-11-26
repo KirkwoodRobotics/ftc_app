@@ -1,4 +1,6 @@
-package org.firstinspires.ftc.teamcode;/*
+package org.firstinspires.ftc.teamcode;
+
+/*
 Copyright (c) 2016 Robert Atkinson
 
 All rights reserved.
@@ -56,20 +58,22 @@ public class AutoDrive extends LinearOpMode {
     /* Declare OpMode members. */
     Hardware robot = new Hardware();
 
+    public final static int TETRIX_TICKS_PER_REV = 1440;
+    public final static int ANDYMARK_TICKS_PER_REV = 1120;
+
     @Override
     public void runOpMode() throws InterruptedException {
+        robot.init(hardwareMap);
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        robot.init(hardwareMap);
-
         waitForStart(); // Wait for the game to start (driver presses PLAY)
 
-        // public void autoDrive(float gamepad1LeftX, float gamepad1LeftY, float gamepad1RightX)
-
-        //robot.arm.setPower(0.3);
-        robot.hAutoDrive("right", 3300); // start with battery side towards cap ball
+        robot.hAutoDriveEncoder("right", ANDYMARK_TICKS_PER_REV * 2); // "right", start with battery side towards cap ball
         //robot.hAutoDrive("rotateClockwise", 700);
         //robot.hAutoDrive("forward", 2400);
+
+        //robot.hAutoDriveEncoder("rotateClockwise", ANDYMARK_TICKS_PER_REV * 2);
     }
 }
