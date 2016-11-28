@@ -35,9 +35,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -52,14 +49,16 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="AutoDrive", group="Linear Opmode")
-public class AutoDrive extends LinearOpMode {
+@Autonomous(name="Auto Drive Encoder", group="Linear Opmode")
+public class AutoDriveEncoder extends LinearOpMode {
 
     /* Declare OpMode members. */
     Hardware robot = new Hardware();
 
     public final static int TETRIX_TICKS_PER_REV = 1440;
     public final static int ANDYMARK_TICKS_PER_REV = 1120;
+
+    public final static int ONE_METER = (int) Math.round(ANDYMARK_TICKS_PER_REV * 2.2); // TODO: measure out, this is not the right measurement
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -70,10 +69,12 @@ public class AutoDrive extends LinearOpMode {
 
         waitForStart(); // Wait for the game to start (driver presses PLAY)
 
-        robot.hAutoDriveEncoder("right", ANDYMARK_TICKS_PER_REV * 2); // "right", start with battery side towards cap ball
-        //robot.hAutoDrive("rotateClockwise", 700);
-        //robot.hAutoDrive("forward", 2400);
+        // "right", start with battery side towards cap ball
 
-        //robot.hAutoDriveEncoder("rotateClockwise", ANDYMARK_TICKS_PER_REV * 2);
+        //robot.hAutoDriveEncoder("right", 0.2f, 1 * ANDYMARK_TICKS_PER_REV);
+        robot.hAutoDriveEncoder("forward", 0.2f, ONE_METER);
+        //robot.hAutoDriveEncoder("backward", 0.2f, ANDYMARK_TICKS_PER_REV * 2);
+        //robot.hAutoDriveEncoder("clockwise", 0.2f, ANDYMARK_TICKS_PER_REV * 2);
+        //robot.hAutoDriveEncoder("counterclockwise", 0.2f, ANDYMARK_TICKS_PER_REV * 2);
     }
 }

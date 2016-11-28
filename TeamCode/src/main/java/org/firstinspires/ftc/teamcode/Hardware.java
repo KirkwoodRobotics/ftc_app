@@ -1,11 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 /**
  * This is NOT an opmode.
@@ -34,14 +32,15 @@ public class Hardware
 
     public DcMotor arm             = null;
 
-    MotorPowerCalc motorPower = new MotorPowerCalc();
+    MotorPowerCalc motorPower      = new MotorPowerCalc();
 
     // Local OpMode members
-    HardwareMap hwMap = null;
-    private ElapsedTime period = new ElapsedTime();
+    HardwareMap hwMap              = null;
+    private ElapsedTime period     = new ElapsedTime();
 
     /* Initialize standard Hardware interfaces */
-    public void init(HardwareMap ahwMap) {
+    public void init(HardwareMap ahwMap)
+    {
         // save reference to HW Map
         hwMap = ahwMap;
 
@@ -61,11 +60,6 @@ public class Hardware
 
         arm.setPower(0);
 
-        frontLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
         arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // Define and initialize servos.
@@ -75,7 +69,7 @@ public class Hardware
         claw.setPosition(CLAW_HOME);*/
     }
 
-    private void autoDriveEncoder(float gamepad1LeftX, float gamepad1LeftY, float gamepad1RightX, int pos)
+    private void autoDriveEncoder(float gamepad1LeftX, float gamepad1LeftY, float gamepad1RightX, int pos, String dir)
     {
         // Reset encoder values to 0
         frontLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -84,10 +78,23 @@ public class Hardware
         backRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Set target position of all motors
-        frontLeftMotor.setTargetPosition(pos);
-        frontRightMotor.setTargetPosition(pos);
-        backLeftMotor.setTargetPosition(pos);
-        backRightMotor.setTargetPosition(pos);
+        // TODO: this is a big hack, fix it
+        if (dir.equals("forward") || dir.equals("backward")) {
+            frontLeftMotor.setTargetPosition(-pos);
+            frontRightMotor.setTargetPosition(pos);
+            backLeftMotor.setTargetPosition(-pos);
+            backRightMotor.setTargetPosition(pos);
+        } else if (dir.equals("right") || dir.equals("left")) {
+            frontLeftMotor.setTargetPosition(-pos);
+            frontRightMotor.setTargetPosition(-pos);
+            backLeftMotor.setTargetPosition(pos);
+            backRightMotor.setTargetPosition(pos);
+        } else if (dir.equals("clockwise") || dir.equals("counterclockwise")) {
+            frontLeftMotor.setTargetPosition(pos);
+            frontRightMotor.setTargetPosition(pos);
+            backLeftMotor.setTargetPosition(pos);
+            backRightMotor.setTargetPosition(pos);
+        }
 
         // Set motors to RUN_TO_POSITION mode
         frontLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -110,7 +117,7 @@ public class Hardware
      *
      * Programs should use this method to drive autonomously, don't call autoDrive() directly
      *
-     * TODO: add power input / magnitude input to allow for values other than -1 and 1
+     * TODO: consider removing
      */
     public void hAutoDrive(String dir, int periodMs) throws InterruptedException
     {
@@ -151,26 +158,32 @@ public class Hardware
      *
      * Programs should use this method to drive autonomously with encoders, don't call autoDriveEncoder() directly
      */
-    public void hAutoDriveEncoder(String dir, int pos) throws InterruptedException
+    public void hAutoDriveEncoder(String dir, float power, int pos) throws InterruptedException
     {
         switch (dir) {
             case "forward":
-                autoDriveEncoder(0, 1, 0, pos);
+                autoDriveEncoder(power, 0, 0, pos, "forward");
                 break;
             case "backward":
-                autoDriveEncoder(0, -1, 0, pos);
+                autoDriveEncoder(power, 0, 0, -pos, "backward");
                 break;
+
             case "right":
-                autoDriveEncoder(1, 0, 0, pos);
+                autoDriveEncoder(0, power, 0, pos, "right");
                 break;
             case "left":
-                autoDriveEncoder(-1, 0, 0, pos);
+                autoDriveEncoder(0, power, 0, -pos, "left");
                 break;
-            case "rotateClockwise": // TODO: reverse to fit with what Josh wanted so we are consistent
-                autoDriveEncoder(0, 0, -1, pos);
+
+            case "clockwise":
+                autoDriveEncoder(0, 0, power, pos, "clockwise");
                 break;
+            case "counterclockwise":
+                autoDriveEncoder(0, 0, power, -pos, "counterclockwise");
+                break;
+
             default:
-                autoDriveEncoder(0, 0, 0, 0);
+                autoDriveEncoder(0, 0, 0, 0, "forward");
                 break;
         }
     }
@@ -178,9 +191,13 @@ public class Hardware
     // TODO: check out Josh's request for exponential sensitivity on joysticks
     public void teleDrive(Gamepad gamepad1)
     {
-        double gamepad1LeftY = -gamepad1.left_stick_y;
-        double gamepad1LeftX = gamepad1.left_stick_x;
-        double gamepad1RightX = -gamepad1.right_stick_x; // reversed
+        double gamepad1LeftY;
+        double gamepad1LeftX;
+        double gamepad1RightX;
+
+        gamepad1LeftY = -gamepad1.left_stick_y;
+        gamepad1LeftX = gamepad1.left_stick_x;
+        gamepad1RightX = -gamepad1.right_stick_x; // reversed
 
         /*gamepad1LeftY = Math.pow((Math.tanh(gamepad1LeftY) / Math.tanh(1)), 3);
         gamepad1LeftX = Math.pow((Math.tanh(gamepad1LeftX) / Math.tanh(1)), 3);

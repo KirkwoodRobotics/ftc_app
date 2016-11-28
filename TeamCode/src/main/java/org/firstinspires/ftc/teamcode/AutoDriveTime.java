@@ -1,3 +1,5 @@
+package org.firstinspires.ftc.teamcode;
+
 /*
 Copyright (c) 2016 Robert Atkinson
 
@@ -30,32 +32,40 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.firstinspires.ftc.robotcontroller.internal.testcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 /**
- * {@link TestInfiniteLoopLinear} is a simple test that runs an infinite loop
+ * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
+ * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
+ * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
+ * class is instantiated on the Robot Controller and executed.
+ *
+ * This particular OpMode just executes a basic Tank Drive Teleop for a PushBot
+ * It includes all the skeletal structure that all linear OpModes contain.
+ *
+ * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
+ * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-@TeleOp(name = "Test: Infinite Loop (Linear)", group = "Tests")
-@Disabled
-public class TestInfiniteLoopLinear extends LinearOpMode {
 
-    @Override public void runOpMode() throws InterruptedException {
+@Autonomous(name="Auto Drive Time", group="Linear Opmode")
+public class AutoDriveTime extends LinearOpMode {
 
-        waitForStart();
+    /* Declare OpMode members. */
+    Hardware robot = new Hardware();
 
-        // Do nothing, forever
-        for (int count = 0; ; count++) {
-            try {
-                telemetry.addData("count", count);
-                updateTelemetry(telemetry);
-                idle();
-            } catch (InterruptedException e) {
-                // ignore: we're trying to do an infinite loop!
-            }
-        }
+    @Override
+    public void runOpMode() throws InterruptedException {
+        robot.init(hardwareMap);
+
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+
+        waitForStart(); // Wait for the game to start (driver presses PLAY)
+
+        robot.hAutoDrive("right", 3300); // "right", start with battery side towards cap ball
+        //robot.hAutoDrive("rotateClockwise", 700);
+        //robot.hAutoDrive("forward", 2400);
     }
 }
