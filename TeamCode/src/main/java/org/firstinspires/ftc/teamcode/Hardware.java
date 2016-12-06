@@ -191,13 +191,9 @@ public class Hardware
     // TODO: check out Josh's request for exponential sensitivity on joysticks
     public void teleDrive(Gamepad gamepad1)
     {
-        double gamepad1LeftY;
-        double gamepad1LeftX;
-        double gamepad1RightX;
-
-        gamepad1LeftY = -gamepad1.left_stick_y;
-        gamepad1LeftX = gamepad1.left_stick_x;
-        gamepad1RightX = -gamepad1.right_stick_x; // reversed
+        double gamepad1LeftY = -gamepad1.left_stick_y;
+        double gamepad1LeftX = gamepad1.left_stick_x;
+        double gamepad1RightX = -gamepad1.right_stick_x; // reversed
 
         /*gamepad1LeftY = Math.pow((Math.tanh(gamepad1LeftY) / Math.tanh(1)), 3);
         gamepad1LeftX = Math.pow((Math.tanh(gamepad1LeftX) / Math.tanh(1)), 3);

@@ -71,10 +71,21 @@ public class AutoDriveEncoder extends LinearOpMode {
 
         // "right", start with battery side towards cap ball
 
-        //robot.hAutoDriveEncoder("right", 0.2f, 1 * ANDYMARK_TICKS_PER_REV);
-        robot.hAutoDriveEncoder("forward", 0.2f, ONE_METER);
-        //robot.hAutoDriveEncoder("backward", 0.2f, ANDYMARK_TICKS_PER_REV * 2);
-        //robot.hAutoDriveEncoder("clockwise", 0.2f, ANDYMARK_TICKS_PER_REV * 2);
-        //robot.hAutoDriveEncoder("counterclockwise", 0.2f, ANDYMARK_TICKS_PER_REV * 2);
+        // to cap ball
+        robot.hAutoDriveEncoder("right", 0.8f, 8 * ANDYMARK_TICKS_PER_REV);
+
+        // to far beacon
+        robot.hAutoDriveEncoder("forward", 0.8f, 4* ANDYMARK_TICKS_PER_REV);
+
+        // to close beacon
+        robot.hAutoDriveEncoder("backward", 0.8f, 2 * ANDYMARK_TICKS_PER_REV);
+        robot.hAutoDriveEncoder("left", 0.8f, 4* ANDYMARK_TICKS_PER_REV);
+        robot.hAutoDriveEncoder("forward", 0.8f, 2 * ANDYMARK_TICKS_PER_REV);
+
+        // to corner vortex
+        robot.hAutoDriveEncoder("backward", 0.8f, 1 * ANDYMARK_TICKS_PER_REV);
+        robot.hAutoDriveEncoder("counterclockwise", 0.2f, 1 * ANDYMARK_TICKS_PER_REV);
+        robot.hAutoDriveEncoder("left", 0.8f, 1 * ANDYMARK_TICKS_PER_REV);
+        robot.hAutoDriveEncoder("forward", 0.5f, 2 * ANDYMARK_TICKS_PER_REV);
     }
 }
