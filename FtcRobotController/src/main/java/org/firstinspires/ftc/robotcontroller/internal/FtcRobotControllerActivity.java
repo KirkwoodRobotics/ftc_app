@@ -39,6 +39,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.hardware.Camera;
 import android.content.res.Resources;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
@@ -52,6 +53,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -177,14 +179,13 @@ public class FtcRobotControllerActivity extends Activity {
 
   protected void passReceivedUsbAttachmentsToEventLoop() {
     if (this.eventLoop != null) {
-      for (;;) {
+      for (; ; ) {
         UsbDevice usbDevice = receivedUsbAttachmentNotifications.poll();
         if (usbDevice == null)
           break;
         this.eventLoop.onUsbDeviceAttached(usbDevice);
       }
-    }
-    else {
+    } else {
       // Paranoia: we don't want the pending list to grow without bound when we don't
       // (yet) have an event loop
       while (receivedUsbAttachmentNotifications.size() > 100) {
@@ -241,7 +242,7 @@ public class FtcRobotControllerActivity extends Activity {
     dimmer.longBright();
 
     programmingModeController = new ProgrammingModeControllerImpl(
-        this, (TextView) findViewById(R.id.textRemoteProgrammingMode));
+            this, (TextView) findViewById(R.id.textRemoteProgrammingMode));
 
     updateUI = createUpdateUI();
     callback = createUICallback(updateUI);
@@ -253,7 +254,9 @@ public class FtcRobotControllerActivity extends Activity {
 
     hittingMenuButtonBrightensScreen();
 
-    if (USE_DEVICE_EMULATION) { HardwareFactory.enableDeviceEmulation(); }
+    if (USE_DEVICE_EMULATION) {
+      HardwareFactory.enableDeviceEmulation();
+    }
 
     wifiLock.acquire();
     callback.networkConnectionUpdate(WifiDirectAssistant.Event.DISCONNECTED);
@@ -343,7 +346,7 @@ public class FtcRobotControllerActivity extends Activity {
     }
   }
 
-  public void writeNetworkTypeFile(String fileName, String fileContents){
+  public void writeNetworkTypeFile(String fileName, String fileContents) {
     ReadWriteFile.writeFile(AppUtil.FIRST_FOLDER, fileName, fileContents);
   }
 
@@ -376,13 +379,13 @@ public class FtcRobotControllerActivity extends Activity {
   }
 
   @Override
-  public void onWindowFocusChanged(boolean hasFocus){
+  public void onWindowFocusChanged(boolean hasFocus) {
     super.onWindowFocusChanged(hasFocus);
     // When the window loses focus (e.g., the action overflow is shown),
     // cancel any pending hide action. When the window gains focus,
     // hide the system UI.
     if (hasFocus) {
-      if (ImmersiveMode.apiOver19()){
+      if (ImmersiveMode.apiOver19()) {
         // Immersive flag only works on API 19 and above.
         immersion.hideSystemUI();
       }
@@ -406,11 +409,11 @@ public class FtcRobotControllerActivity extends Activity {
       if (cfgFileMgr.getActiveConfig().isNoConfig()) {
         // Tell the user they must configure the robot before starting programming mode.
         AppUtil.getInstance().showToast(
-            context, context.getString(R.string.toastConfigureRobotBeforeProgrammingMode));
+                context, context.getString(R.string.toastConfigureRobotBeforeProgrammingMode));
       } else {
         Intent programmingModeIntent = new Intent(ProgrammingModeActivity.launchIntent);
         programmingModeIntent.putExtra(
-            LaunchActivityConstantsList.PROGRAMMING_MODE_ACTIVITY_NETWORK_TYPE, networkType);
+                LaunchActivityConstantsList.PROGRAMMING_MODE_ACTIVITY_NETWORK_TYPE, networkType);
         startActivity(programmingModeIntent);
       }
       return true;
@@ -418,41 +421,35 @@ public class FtcRobotControllerActivity extends Activity {
       Intent inspectionModeIntent = new Intent(RcInspectionActivity.rcLaunchIntent);
       startActivity(inspectionModeIntent);
       return true;
-    }
-    else if (id == R.id.action_blocks) {
+    } else if (id == R.id.action_blocks) {
       Intent blocksIntent = new Intent(BlocksActivity.launchIntent);
       startActivity(blocksIntent);
       return true;
-    }
-    else if (id == R.id.action_restart_robot) {
+    } else if (id == R.id.action_restart_robot) {
       dimmer.handleDimTimer();
       AppUtil.getInstance().showToast(context, context.getString(R.string.toastRestartingRobot));
       requestRobotRestart();
       return true;
-    }
-    else if (id == R.id.action_configure_robot) {
+    } else if (id == R.id.action_configure_robot) {
       EditParameters parameters = new EditParameters();
       Intent intentConfigure = new Intent(FtcLoadFileActivity.launchIntent);
       parameters.putIntent(intentConfigure);
       startActivityForResult(intentConfigure, LaunchActivityConstantsList.FTC_CONFIGURE_REQUEST_CODE_ROBOT_CONTROLLER);
-    }
-    else if (id == R.id.action_settings) {
+    } else if (id == R.id.action_settings) {
       Intent settingsIntent = new Intent(FtcRobotControllerSettingsActivity.launchIntent);
       startActivityForResult(settingsIntent, LaunchActivityConstantsList.FTC_CONFIGURE_REQUEST_CODE_ROBOT_CONTROLLER);
       return true;
-    }
-    else if (id == R.id.action_about) {
+    } else if (id == R.id.action_about) {
       Intent intent = new Intent(AboutActivity.launchIntent);
       intent.putExtra(LaunchActivityConstantsList.ABOUT_ACTIVITY_CONNECTION_TYPE, networkType);
       startActivity(intent);
       return true;
-    }
-    else if (id == R.id.action_exit_app) {
+    } else if (id == R.id.action_exit_app) {
       finish();
       return true;
     }
 
-   return super.onOptionsItemSelected(item);
+    return super.onOptionsItemSelected(item);
   }
 
   @Override
@@ -541,4 +538,54 @@ public class FtcRobotControllerActivity extends Activity {
       });
     }
   }
+
+  /////////////////////////////////////////////////////////
+  // ADDED FOR CAMERA!!!
+
+  public void initPreview(final Camera camera, final OpModeCamera context, final Camera.PreviewCallback previewCallback) {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        context.preview = new CameraPreview(FtcRobotControllerActivity.this, camera, previewCallback);
+        FrameLayout previewLayout = (FrameLayout) findViewById(R.id.previewLayout);
+        previewLayout.addView(context.preview);
+      }
+    });
+  }
+
+  // poor coding style here.  Shouldn't have to duplicate these routines for regular and linear OpModes.
+  public void initPreviewLinear(final Camera camera, final LinearOpModeCamera context, final Camera.PreviewCallback previewCallback) {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        context.preview = new CameraPreview(FtcRobotControllerActivity.this, camera, previewCallback);
+        FrameLayout previewLayout = (FrameLayout) findViewById(R.id.previewLayout);
+        previewLayout.addView(context.preview);
+      }
+    });
+  }
+
+
+  public void removePreview(final OpModeCamera context) {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        FrameLayout previewLayout = (FrameLayout) findViewById(R.id.previewLayout);
+        previewLayout.removeAllViews();
+      }
+    });
+  }
+
+  public void removePreviewLinear(final LinearOpModeCamera context) {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        FrameLayout previewLayout = (FrameLayout) findViewById(R.id.previewLayout);
+        previewLayout.removeAllViews();
+      }
+    });
+  }
+
+  // END CAMERA ADD!!!
+  //////////////////////////////////////////////
 }

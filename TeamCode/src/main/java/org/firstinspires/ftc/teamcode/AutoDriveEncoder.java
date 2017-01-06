@@ -75,7 +75,7 @@ public class AutoDriveEncoder extends LinearOpMode {
         robot.hAutoDriveEncoder("right", 0.8f, 8 * ANDYMARK_TICKS_PER_REV);
 
         // to far beacon
-        robot.hAutoDriveEncoder("forward", 0.8f, 4* ANDYMARK_TICKS_PER_REV);
+        robot.hAutoDriveEncoder("forward", 0.8f, 4 * ANDYMARK_TICKS_PER_REV);
 
         // to close beacon
         robot.hAutoDriveEncoder("backward", 0.8f, 2 * ANDYMARK_TICKS_PER_REV);

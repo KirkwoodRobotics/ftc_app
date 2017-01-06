@@ -31,6 +31,7 @@ public class Hardware
     public DcMotor backRightMotor  = null;
 
     public DcMotor arm             = null;
+    public DcMotor loader          = null;
 
     MotorPowerCalc motorPower      = new MotorPowerCalc();
 
@@ -51,6 +52,7 @@ public class Hardware
         backRightMotor  = hwMap.dcMotor.get("backRight");
 
         arm             = hwMap.dcMotor.get("arm");
+        loader          = hwMap.dcMotor.get("loader");
 
         // Set all motors to zero power
         frontLeftMotor.setPower(0);
@@ -59,14 +61,13 @@ public class Hardware
         backRightMotor.setPower(0);
 
         arm.setPower(0);
+        loader.setPower(0);
 
-        arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        loader.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // Define and initialize servos.
         /*arm = hwMap.servo.get("arm");
-        claw = hwMap.servo.get("claw");
-        arm.setPosition(ARM_HOME);
-        claw.setPosition(CLAW_HOME);*/
+        arm.setPosition(ARM_HOME);*/
     }
 
     private void autoDriveEncoder(float gamepad1LeftX, float gamepad1LeftY, float gamepad1RightX, int pos, String dir)

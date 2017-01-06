@@ -38,18 +38,22 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 /**
  * Holonomic Drive
  */
 
-@TeleOp(name="HoloDrive", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@TeleOp(name="HoloDrive", group="Linear Opmode")
 public class HoloDrive extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     Hardware robot = new Hardware();
+
+    private double armPower;
+
+    int armPos = 0;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -57,6 +61,10 @@ public class HoloDrive extends LinearOpMode {
         telemetry.update();
 
         robot.init(hardwareMap);
+
+        robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        TouchSensor touchSensor = hardwareMap.touchSensor.get("sensor_touch");
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -67,22 +75,54 @@ public class HoloDrive extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
 
             telemetry.addData("Status", ": " + robot.motorPower.printPower().toString());
+            telemetry.addData("arm cur pos", ": " + robot.arm.getCurrentPosition());
 
             robot.teleDrive(gamepad1);
 
             // arm
-            if (gamepad1.a) {
-                robot.arm.setPower(1);
-            } else {
+            if (gamepad2.a) {
+                robot.arm.setPower(-0.55);
+
+                /*robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                runArm(-1420);*/
+            }
+
+            if (touchSensor.isPressed()) {
                 robot.arm.setPower(0);
             }
 
-            if (gamepad1.b) {
-                robot.arm.setPower(-0.5);
+
+
+            if (gamepad2.dpad_right) {
+                runArm(armPos);
+                armPos -= 3;
             }
+
+            if (gamepad2.dpad_left) {
+                runArm(armPos);
+                armPos += 3;
+            }
+
+            // loader
+            robot.loader.setPower(gamepad2.left_stick_y);
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
             telemetry.update();
         }
+    }
+
+    public void runArm(int pos) {
+        // Set target position of motor
+        robot.arm.setTargetPosition(pos);
+
+        // Set motor to RUN_TO_POSITION mode
+        //robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        armPower = -1;
+
+        armPower = Range.clip(armPower, -1, 1); // keep here just for kicks
+
+        robot.arm.setPower(armPower);
     }
 }
