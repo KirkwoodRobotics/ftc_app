@@ -49,22 +49,23 @@ public class HoloDrive extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-    Hardware robot = new Hardware();
-
-    private double armPower;
-
-    int armPos = 0;
+    private Hardware robot = new Hardware();
 
     @Override
     public void runOpMode() throws InterruptedException {
+        final double ARM_DOWN_POWER = -0.39;
+        final double ARM_UP_POWER   =  1.00;
+
+        boolean runUsingEncoder     = true;
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         robot.init(hardwareMap);
 
-        robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
         TouchSensor touchSensor = hardwareMap.touchSensor.get("sensor_touch");
+
+        robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -74,34 +75,38 @@ public class HoloDrive extends LinearOpMode {
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
 
-            telemetry.addData("Status", ": " + robot.motorPower.printPower().toString());
+            telemetry.addData("Status", ": " + robot.motorPower.printPower());
             telemetry.addData("arm cur pos", ": " + robot.arm.getCurrentPosition());
 
             robot.teleDrive(gamepad1);
 
             // arm
-            if (gamepad2.a) {
-                robot.arm.setPower(-0.55);
+            if (gamepad2.a) { // load with a
+                if (!runUsingEncoder) {
+                    robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-                /*robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                runArm(-1420);*/
-            }
+                    runUsingEncoder = true;
+                }
 
-            if (touchSensor.isPressed()) {
-                robot.arm.setPower(0);
-            }
+                robot.arm.setPower(ARM_DOWN_POWER);
+            } else if (touchSensor.isPressed()) {
+                if (runUsingEncoder) {
+                    robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+                    runUsingEncoder = false;
+                }
 
+                robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-            if (gamepad2.dpad_right) {
-                runArm(armPos);
-                armPos -= 3;
-            }
+                int curPos = robot.arm.getCurrentPosition();
 
-            if (gamepad2.dpad_left) {
-                runArm(armPos);
-                armPos += 3;
+                robot.arm.setTargetPosition(curPos);
+
+                robot.arm.setPower(-0.1);
+
+                if (gamepad2.b) { // launch with b
+                    robot.arm.setTargetPosition(curPos + 900);
+                }
             }
 
             // loader
@@ -110,19 +115,5 @@ public class HoloDrive extends LinearOpMode {
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
             telemetry.update();
         }
-    }
-
-    public void runArm(int pos) {
-        // Set target position of motor
-        robot.arm.setTargetPosition(pos);
-
-        // Set motor to RUN_TO_POSITION mode
-        //robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        armPower = -1;
-
-        armPower = Range.clip(armPower, -1, 1); // keep here just for kicks
-
-        robot.arm.setPower(armPower);
     }
 }
