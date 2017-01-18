@@ -35,6 +35,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -55,10 +57,11 @@ public class AutoDriveEncoder extends LinearOpMode {
     /* Declare OpMode members. */
     Hardware robot = new Hardware();
 
+    final double ARM_DOWN_POWER = -0.39;
+    final long WAIT             = 1000;
+
     public final static int TETRIX_TICKS_PER_REV = 1440;
     public final static int ANDYMARK_TICKS_PER_REV = 1120;
-
-    public final static int ONE_METER = (int) Math.round(ANDYMARK_TICKS_PER_REV * 2.2); // TODO: measure out, this is not the right measurement
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -69,13 +72,41 @@ public class AutoDriveEncoder extends LinearOpMode {
 
         waitForStart(); // Wait for the game to start (driver presses PLAY)
 
-        // "right", start with battery side towards cap ball
+        // start with arm pointing towards center vortex
+
+        // to firing position
+        //robot.hAutoDriveEncoder("forward", 0.8f, 1 * ANDYMARK_TICKS_PER_REV);
+
+        // hold down arm before firing
+        actuateArm();
+
+        robot.waitForTick(WAIT + 3000);
+
+        // fire ball one
+        //actuateArm();
+
+        robot.waitForTick(WAIT);
+
+        // hold down arm before loading
+        //actuateArm();
+
+        robot.waitForTick(WAIT);
+
+        // load ball two
+        /*robot.loader.setPower(1);
+        robot.waitForTick(2500);
+        robot.loader.setPower(0);
+
+        robot.waitForTick(WAIT);
+
+        // fire ball two
+        actuateArm();*/
 
         // to cap ball
-        robot.hAutoDriveEncoder("right", 0.8f, 8 * ANDYMARK_TICKS_PER_REV);
+        //robot.hAutoDriveEncoder("forward", 0.8f, 4 * ANDYMARK_TICKS_PER_REV);
 
-        // to far beacon
-        robot.hAutoDriveEncoder("forward", 0.8f, 4 * ANDYMARK_TICKS_PER_REV);
+        // to close beacon
+        /*robot.hAutoDriveEncoder("forward", 0.8f, 4 * ANDYMARK_TICKS_PER_REV);
 
         // to close beacon
         robot.hAutoDriveEncoder("backward", 0.8f, 2 * ANDYMARK_TICKS_PER_REV);
@@ -86,6 +117,29 @@ public class AutoDriveEncoder extends LinearOpMode {
         robot.hAutoDriveEncoder("backward", 0.8f, 1 * ANDYMARK_TICKS_PER_REV);
         robot.hAutoDriveEncoder("counterclockwise", 0.2f, 1 * ANDYMARK_TICKS_PER_REV);
         robot.hAutoDriveEncoder("left", 0.8f, 1 * ANDYMARK_TICKS_PER_REV);
-        robot.hAutoDriveEncoder("forward", 0.5f, 2 * ANDYMARK_TICKS_PER_REV);
+        robot.hAutoDriveEncoder("forward", 0.5f, 3 * ANDYMARK_TICKS_PER_REV);*/
+    }
+
+    private int actuateArm() throws InterruptedException {
+        robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        //robot.arm.setPower(ARM_DOWN_POWER);
+
+        int curPos = -1; // if -1 gets returned then treat it as an error
+
+        if (touchSensor.isPressed()) {
+            // keep arm down before firing
+            //robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            //robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            /*curPos = robot.arm.getCurrentPosition();
+            robot.arm.setTargetPosition(curPos);*/
+
+            telemetry.addData("TouchSensor", "isPressed");
+        }
+
+        robot.waitForTick(WAIT);
+
+        return curPos;
     }
 }

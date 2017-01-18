@@ -66,6 +66,7 @@ public class HoloDrive extends LinearOpMode {
         TouchSensor touchSensor = hardwareMap.touchSensor.get("sensor_touch");
 
         robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.loader.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -77,6 +78,7 @@ public class HoloDrive extends LinearOpMode {
 
             telemetry.addData("Status", ": " + robot.motorPower.printPower());
             telemetry.addData("arm cur pos", ": " + robot.arm.getCurrentPosition());
+            telemetry.addData("left Y", ": " + gamepad2.left_stick_y);
 
             robot.teleDrive(gamepad1);
 
@@ -103,10 +105,6 @@ public class HoloDrive extends LinearOpMode {
                 robot.arm.setTargetPosition(curPos);
 
                 robot.arm.setPower(-0.1);
-
-                if (gamepad2.b) { // launch with b
-                    robot.arm.setTargetPosition(curPos + 900);
-                }
             }
 
             // loader

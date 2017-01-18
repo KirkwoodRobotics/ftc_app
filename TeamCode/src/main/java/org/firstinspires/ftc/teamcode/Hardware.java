@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.teamcode.GamepadValuesReturn;
 
 /**
  * This is NOT an opmode.
@@ -34,6 +36,8 @@ public class Hardware
     public DcMotor loader          = null;
 
     MotorPowerCalc motorPower      = new MotorPowerCalc();
+
+    GamepadValuesReturn gVR;
 
     // Local OpMode members
     HardwareMap hwMap              = null;
@@ -68,6 +72,8 @@ public class Hardware
         // Define and initialize servos.
         /*arm = hwMap.servo.get("arm");
         arm.setPosition(ARM_HOME);*/
+
+        TouchSensor touchSensor = hwMap.touchSensor.get("sensor_touch");
     }
 
     private void autoDriveEncoder(float gamepad1LeftX, float gamepad1LeftY, float gamepad1RightX, int pos, String dir)
@@ -79,7 +85,6 @@ public class Hardware
         backRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Set target position of all motors
-        // TODO: this is a big hack, fix it
         if (dir.equals("forward") || dir.equals("backward")) {
             frontLeftMotor.setTargetPosition(-pos);
             frontRightMotor.setTargetPosition(pos);
@@ -117,8 +122,6 @@ public class Hardware
      * hAutoDrive = human (readable) auto drive (without encoders)
      *
      * Programs should use this method to drive autonomously, don't call autoDrive() directly
-     *
-     * TODO: consider removing
      */
     public void hAutoDrive(String dir, int periodMs) throws InterruptedException
     {
@@ -139,7 +142,7 @@ public class Hardware
                 motorPower.calcAndSetMotorPower(-1, 0, 0,
                         frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
                 break;
-            case "rotateClockwise": // TODO: reverse to fit with what Josh wanted so we are consistent
+            case "rotateClockwise":
                 motorPower.calcAndSetMotorPower(0, 0, -1,
                     frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
                 break;
@@ -189,19 +192,20 @@ public class Hardware
         }
     }
 
-    // TODO: check out Josh's request for exponential sensitivity on joysticks
     public void teleDrive(Gamepad gamepad1)
     {
         double gamepad1LeftY = -gamepad1.left_stick_y;
         double gamepad1LeftX = gamepad1.left_stick_x;
         double gamepad1RightX = -gamepad1.right_stick_x; // reversed
 
-        /*gamepad1LeftY = Math.pow((Math.tanh(gamepad1LeftY) / Math.tanh(1)), 3);
+        gamepad1LeftY = Math.pow((Math.tanh(gamepad1LeftY) / Math.tanh(1)), 3);
         gamepad1LeftX = Math.pow((Math.tanh(gamepad1LeftX) / Math.tanh(1)), 3);
-        gamepad1RightX = Math.pow((Math.tanh(gamepad1RightX) / Math.tanh(1)), 3);*/
+        gamepad1RightX = Math.pow((Math.tanh(gamepad1RightX) / Math.tanh(1)), 3);
 
         motorPower.calcAndSetMotorPower(gamepad1LeftX, gamepad1LeftY, gamepad1RightX,
                 frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
+
+        //return new GamepadValuesReturn.setAndPrint(gamepad1LeftY, gamepad1LeftX, gamepad1RightX);
     }
 
     /***
