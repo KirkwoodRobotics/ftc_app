@@ -139,49 +139,7 @@ public class FtcRobotControllerActivity extends Activity {
   protected Queue<UsbDevice> receivedUsbAttachmentNotifications;
 
 
-  public void initPreview(final Camera camera, final OpModeCamera context, final Camera.PreviewCallback previewCallback) {
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        context.preview = new CameraPreview(FtcRobotControllerActivity.this, camera, previewCallback);
-        FrameLayout previewLayout = (FrameLayout) findViewById(R.id.previewLayout);
-        previewLayout.addView(context.preview);
-      }
-    });
-  }
 
-  // poor coding style here.  Shouldn't have to duplicate these routines for regular and linear OpModes.
-  public void initPreviewLinear(final Camera camera, final LinearOpModeCamera context, final Camera.PreviewCallback previewCallback) {
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        context.preview = new CameraPreview(FtcRobotControllerActivity.this, camera, previewCallback);
-        FrameLayout previewLayout = (FrameLayout) findViewById(R.id.previewLayout);
-        previewLayout.addView(context.preview);
-      }
-    });
-  }
-
-
-  public void removePreview(final OpModeCamera context) {
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        FrameLayout previewLayout = (FrameLayout) findViewById(R.id.previewLayout);
-        previewLayout.removeAllViews();
-      }
-    });
-  }
-
-  public void removePreviewLinear(final LinearOpModeCamera context) {
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        FrameLayout previewLayout = (FrameLayout) findViewById(R.id.previewLayout);
-        previewLayout.removeAllViews();
-      }
-    });
-  }
 
   protected class RobotRestarter implements Restarter {
 

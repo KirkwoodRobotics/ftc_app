@@ -59,7 +59,7 @@ public class Pushoriginmaster extends OpMode{
 
 
 
-    /*
+    /* Subscriber Twitch Prime jp_corner : question -- what supports is helm is a good pick up on?
      * Code to run ONCE when the driver hits INIT
      */
     @Override
@@ -101,18 +101,7 @@ public class Pushoriginmaster extends OpMode{
         right = -gamepad1.right_stick_y;
         robot.leftMotor.setPower(left);
         robot.rightMotor.setPower(right);
-        if(gamepad1.right_bumper)
-        {
-            robot.launchMotor.setPower(.75);
-        }
-        else if(gamepad1.left_bumper)
-        {
-            robot.launchMotor.setPower(.55);
-        }
-        else
-        {
-            robot.launchMotor.setPower(0);
-        }
+
 
 
 

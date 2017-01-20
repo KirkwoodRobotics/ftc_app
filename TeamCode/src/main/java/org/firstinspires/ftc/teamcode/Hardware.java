@@ -26,7 +26,6 @@ public class Hardware
     public DcMotor  leftMotor   = null;
     public DcMotor  rightMotor  = null;
 
-    public DcMotor  launchMotor = null;
 
 
     HardwareMap hwMap           =  null;
@@ -46,22 +45,18 @@ public class Hardware
         // Define and Initialize Motors
         leftMotor   = hwMap.dcMotor.get("left_drive");
         rightMotor  = hwMap.dcMotor.get("right_drive");
-        launchMotor = hwMap.dcMotor.get("launch_mechanism");
 
         leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
-        launchMotor.setDirection(DcMotor.Direction.FORWARD);
 
         // Set all motors to zero power
         leftMotor.setPower(0);
         rightMotor.setPower(0);
-        launchMotor.setPower(0);
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
         leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        launchMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
     }

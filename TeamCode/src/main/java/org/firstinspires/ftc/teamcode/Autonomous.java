@@ -74,10 +74,7 @@ public class Autonomous extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        /*
-         * Initialize the drive system variables.
-         * The init() method of the hardware class does all the work here
-         */
+
         robot.init(hardwareMap);
 
         // Send telemetry message to indicate successful Encoder reset
@@ -87,6 +84,7 @@ public class Autonomous extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
+        //currently able to knock off ball and park
         robot.autoDrive("forward", 3500);
         //robot.autoDrive("right", 2000);
         //robot.autoDrive("forward", 1000);
