@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -25,6 +26,9 @@ public class Hardware
     /* Public OpMode members. */
     public DcMotor  leftMotor   = null;
     public DcMotor  rightMotor  = null;
+    public DcMotor lifter = null;
+
+    public Servo restrain = null;
 
 
 
@@ -46,23 +50,34 @@ public class Hardware
         leftMotor   = hwMap.dcMotor.get("left_drive");
         rightMotor  = hwMap.dcMotor.get("right_drive");
 
+        lifter  = hwMap.dcMotor.get("lifter");
+
+        restrain = hwMap.servo.get("restrain");
+
+
+
         leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+        lifter.setDirection(DcMotor.Direction.REVERSE);
+
 
         // Set all motors to zero power
         leftMotor.setPower(0);
         rightMotor.setPower(0);
+        lifter.setPower(0);
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
         leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        lifter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
     }
 
     public void autoDrive(String dir, int time) throws InterruptedException
     {
+
         switch(dir)
         {
             case "forward":
@@ -74,14 +89,18 @@ public class Hardware
                 rightMotor.setPower(-100);
                 break;
             case "left":
-                rightMotor.setPower(50);
-                leftMotor.setPower(-50);
+                rightMotor.setPower(100);
+                leftMotor.setPower(-100);
                 break;
             case "right":
-                leftMotor.setPower(50);
-                rightMotor.setPower(-50);
+                leftMotor.setPower(100);
+                rightMotor.setPower(-100);
                 break;
+             default:
+                break;
+
         }
+
         waitForTick(time);
         leftMotor.setPower(0);
         rightMotor.setPower(0);

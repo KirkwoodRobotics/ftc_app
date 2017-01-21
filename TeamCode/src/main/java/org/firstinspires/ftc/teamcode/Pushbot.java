@@ -32,12 +32,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
 /**
  * This file provides basic Telop driving for a Pushbot robot.
@@ -105,11 +101,22 @@ public class Pushbot extends OpMode{
         right = -gamepad1.right_stick_y;
         robot.leftMotor.setPower(left);
         robot.rightMotor.setPower(right);
+        if(gamepad1.dpad_up)
+        {
+            robot.lifter.setPower(100);
+        }
+        else if(gamepad1.dpad_down)
+        {
+            robot.lifter.setPower(-100);
+        }
 
 
 
         // Move both servos to new position.  Assume servos are mirror image of each other.
-
+        if (gamepad1.right_bumper)
+        {
+            robot.restrain.setPosition(0.8);
+        }
 
 
         // Send telemetry message to signify robot running;

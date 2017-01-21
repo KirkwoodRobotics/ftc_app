@@ -1,5 +1,6 @@
-package com.qualcomm.ftcrobotcontroller.opmodes;
+package org.firstinspires.ftc.teamcode.VisionOpModes;
 
+import org.firstinspires.ftc.teamcode.Hardware;
 import org.lasarobotics.vision.android.Cameras;
 import org.lasarobotics.vision.ftc.resq.Beacon;
 import org.lasarobotics.vision.opmode.VisionOpMode;
@@ -18,11 +19,13 @@ import org.opencv.core.Size;
  * even extend the VisionOpMode class! Be sure to extend it if writing your own OpMode structure.
  */
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="BasicVisionSample", group="Pushbot")
-public class BasicVisionSample extends VisionOpMode {
+public class BasicRedVisionSample extends VisionOpMode {
 
-    @Override
-    public void init() {
+    Hardware robot = new Hardware();
+
+    public void init(){
         super.init();
+        robot.init(hardwareMap);
 
         /**
          * Set the camera used for detection
@@ -95,6 +98,34 @@ public class BasicVisionSample extends VisionOpMode {
          */
         cameraControl.setColorTemperature(CameraControlExtension.ColorTemperature.AUTO);
         cameraControl.setAutoExposureCompensation();
+
+
+    }
+    public void run() throws InterruptedException {
+
+        robot.autoDrive("forward", 2500);
+        robot.autoDrive("right", 2000);
+        robot.autoDrive("forward", 1600);
+        char initial = beacon.getAnalysis().getColorString().charAt(0);
+        if (initial == 'r') {
+            robot.autoDrive("right", 2000);
+            robot.autoDrive("forward", 500);
+        }
+        else{
+            robot.autoDrive("left", 2000);
+            robot.autoDrive("forward", 500);
+        }
+        robot.autoDrive("backward",1000);
+    }
+
+    @Override
+    public void start() {
+        super.start();
+        try {
+            run();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

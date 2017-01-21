@@ -85,7 +85,7 @@ public class Autonomous extends LinearOpMode {
         waitForStart();
 
         //currently able to knock off ball and park
-        robot.autoDrive("forward", 3500);
+        robot.autoDrive("forward", 3500); //about 101 inches
         //robot.autoDrive("right", 2000);
         //robot.autoDrive("forward", 1000);
 
