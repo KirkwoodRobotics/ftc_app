@@ -37,7 +37,7 @@ public class Hardware
 
     MotorPowerCalc motorPower      = new MotorPowerCalc();
 
-    GamepadValuesReturn gVR;
+    TouchSensor touchSensor        = null;
 
     // Local OpMode members
     HardwareMap hwMap              = null;
@@ -73,7 +73,7 @@ public class Hardware
         /*arm = hwMap.servo.get("arm");
         arm.setPosition(ARM_HOME);*/
 
-        TouchSensor touchSensor = hwMap.touchSensor.get("sensor_touch");
+        touchSensor = hwMap.touchSensor.get("sensor_touch");
     }
 
     private void autoDriveEncoder(float gamepad1LeftX, float gamepad1LeftY, float gamepad1RightX, int pos, String dir)
@@ -111,7 +111,7 @@ public class Hardware
         motorPower.calcAndSetMotorPower(gamepad1LeftX, gamepad1LeftY, gamepad1RightX,
                 frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
 
-        while(frontLeftMotor.isBusy() || frontRightMotor.isBusy() || backLeftMotor.isBusy() || backRightMotor.isBusy()) {
+        while (frontLeftMotor.isBusy() || frontRightMotor.isBusy() || backLeftMotor.isBusy() || backRightMotor.isBusy()) {
             // wait until motors reach target position
         }
 
@@ -204,8 +204,6 @@ public class Hardware
 
         motorPower.calcAndSetMotorPower(gamepad1LeftX, gamepad1LeftY, gamepad1RightX,
                 frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
-
-        //return new GamepadValuesReturn.setAndPrint(gamepad1LeftY, gamepad1LeftX, gamepad1RightX);
     }
 
     /***

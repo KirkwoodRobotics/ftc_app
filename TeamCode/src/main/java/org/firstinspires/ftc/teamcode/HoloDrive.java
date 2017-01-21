@@ -53,8 +53,7 @@ public class HoloDrive extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        final double ARM_DOWN_POWER = -0.39;
-        final double ARM_UP_POWER   =  1.00;
+        final double ARM_DOWN_POWER = -0.17;
 
         boolean runUsingEncoder     = true;
 
@@ -102,9 +101,9 @@ public class HoloDrive extends LinearOpMode {
 
                 int curPos = robot.arm.getCurrentPosition();
 
-                robot.arm.setTargetPosition(curPos);
+                robot.arm.setTargetPosition(curPos - 200);
 
-                robot.arm.setPower(-0.1);
+                robot.arm.setPower(-0.3);
             }
 
             // loader
