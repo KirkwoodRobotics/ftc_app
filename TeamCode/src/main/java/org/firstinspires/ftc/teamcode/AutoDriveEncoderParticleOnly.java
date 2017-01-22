@@ -35,7 +35,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -50,13 +49,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto Drive Encoder", group="Linear Opmode")
-public class AutoDriveEncoder extends LinearOpMode {
+@Autonomous(name="ADE - Particles Only", group="Linear Opmode")
+public class AutoDriveEncoderParticleOnly extends LinearOpMode {
 
     /* Declare OpMode members. */
     Hardware robot = new Hardware();
 
-    final double ARM_DOWN_POWER = -0.30;
     final long WAIT             = 1000;
 
     private int curPos;
@@ -75,76 +73,29 @@ public class AutoDriveEncoder extends LinearOpMode {
 
         // start with arm pointing towards center vortex
 
-        // to firing position
+        // to firing position 1450
         robot.hAutoDriveEncoder("forward", 0.5f, 1450);
 
         // hold down arm before firing
-        holdDownArm();
+        robot.holdDownArm(curPos);
         robot.waitForTick(WAIT);
 
         // fire ball one
-        fireArm();
+        robot.fireArm(curPos);
         robot.waitForTick(WAIT);
 
         // hold down arm before loading
-        holdDownArm();
-        robot.waitForTick(2000);
+        robot.holdDownArm(curPos);
 
         // load ball two
-        robot.loader.setPower(1);
-        robot.waitForTick(3500);
-        robot.loader.setPower(0);
-        robot.waitForTick(WAIT);
+        if (robot.touchSensor.isPressed()) { // only load ball if touch sensor is pressed so it does not get stuck
+            robot.loader.setPower(1);
+            robot.waitForTick(3500);
+            robot.loader.setPower(0);
+            robot.waitForTick(WAIT);
 
-        // fire ball two
-        fireArm();
-
-        // to cap ball
-        robot.hAutoDriveEncoder("forward", 0.8f, 4 * ANDYMARK_TICKS_PER_REV);
-
-        // to close beacon
-        /*robot.hAutoDriveEncoder("forward", 0.8f, 4 * ANDYMARK_TICKS_PER_REV);
-
-        // to close beacon
-        robot.hAutoDriveEncoder("backward", 0.8f, 2 * ANDYMARK_TICKS_PER_REV);
-        robot.hAutoDriveEncoder("left", 0.8f, 4* ANDYMARK_TICKS_PER_REV);
-        robot.hAutoDriveEncoder("forward", 0.8f, 2 * ANDYMARK_TICKS_PER_REV);
-
-        // to corner vortex
-        robot.hAutoDriveEncoder("backward", 0.8f, 1 * ANDYMARK_TICKS_PER_REV);
-        robot.hAutoDriveEncoder("counterclockwise", 0.2f, 1 * ANDYMARK_TICKS_PER_REV);
-        robot.hAutoDriveEncoder("left", 0.8f, 1 * ANDYMARK_TICKS_PER_REV);
-        robot.hAutoDriveEncoder("forward", 0.5f, 3 * ANDYMARK_TICKS_PER_REV);*/
-    }
-
-    private void holdDownArm() throws InterruptedException {
-        curPos = -1; // if -1 gets returned then treat it as an error
-
-        robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        while (!robot.touchSensor.isPressed()) {
-            robot.arm.setPower(ARM_DOWN_POWER);
+            // fire ball two
+            robot.fireArm(curPos);
         }
-
-        if (robot.touchSensor.isPressed()) {
-            // keep arm down before firing
-            robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-            curPos = robot.arm.getCurrentPosition();
-            robot.arm.setTargetPosition(curPos + 500);
-            robot.arm.setPower(ARM_DOWN_POWER);
-        }
-
-        robot.waitForTick(WAIT);
-    }
-
-    private void fireArm() throws InterruptedException {
-        robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        robot.arm.setTargetPosition(curPos - 500);
-        robot.arm.setPower(ARM_DOWN_POWER);
-
-        robot.waitForTick(WAIT);
     }
 }

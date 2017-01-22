@@ -34,8 +34,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -50,12 +50,18 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto Drive Time", group="Linear Opmode")
-@Disabled
-public class AutoDriveTime extends LinearOpMode {
+@Autonomous(name="ADE - Particles and Cap Ball", group="Linear Opmode")
+public class AutoDriveEncoderParticleCap extends LinearOpMode {
 
     /* Declare OpMode members. */
     Hardware robot = new Hardware();
+
+    final long WAIT             = 1000;
+
+    private int curPos;
+
+    public final static int TETRIX_TICKS_PER_REV   = 1440;
+    public final static int ANDYMARK_TICKS_PER_REV = 1120;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -66,8 +72,47 @@ public class AutoDriveTime extends LinearOpMode {
 
         waitForStart(); // Wait for the game to start (driver presses PLAY)
 
-        robot.hAutoDrive("right", 3300); // "right", start with battery side towards cap ball
-        //robot.hAutoDrive("rotateClockwise", 700);
-        //robot.hAutoDrive("forward", 2400);
+        // start with arm pointing towards center vortex
+
+        // to firing position
+        robot.hAutoDriveEncoder("forward", 0.5f, 1450);
+
+        // hold down arm before firing
+        robot.holdDownArm(curPos);
+        robot.waitForTick(WAIT);
+
+        // fire ball one
+        robot.fireArm(curPos);
+        robot.waitForTick(WAIT);
+
+        // hold down arm before loading
+        robot.holdDownArm(curPos);
+        robot.waitForTick(2000);
+
+        // load ball two
+        robot.loader.setPower(1);
+        robot.waitForTick(3500);
+        robot.loader.setPower(0);
+        robot.waitForTick(WAIT);
+
+        // fire ball two
+        robot.fireArm(curPos);
+
+        // to cap ball
+        robot.hAutoDriveEncoder("forward", 0.8f, 4 * ANDYMARK_TICKS_PER_REV);
+
+        // to close beacon
+        /*robot.hAutoDriveEncoder("forward", 0.8f, 4 * ANDYMARK_TICKS_PER_REV);
+
+        // to close beacon
+        robot.hAutoDriveEncoder("backward", 0.8f, 2 * ANDYMARK_TICKS_PER_REV);
+        robot.hAutoDriveEncoder("left", 0.8f, 4* ANDYMARK_TICKS_PER_REV);
+        robot.hAutoDriveEncoder("forward", 0.8f, 2 * ANDYMARK_TICKS_PER_REV);
+
+        // to corner vortex
+        robot.hAutoDriveEncoder("backward", 0.8f, 1 * ANDYMARK_TICKS_PER_REV);
+        robot.hAutoDriveEncoder("counterclockwise", 0.2f, 1 * ANDYMARK_TICKS_PER_REV);
+        robot.hAutoDriveEncoder("left", 0.8f, 1 * ANDYMARK_TICKS_PER_REV);
+        robot.hAutoDriveEncoder("forward", 0.5f, 3 * ANDYMARK_TICKS_PER_REV);*/
     }
 }

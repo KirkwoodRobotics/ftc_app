@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.teamcode.GamepadValuesReturn;
 
 /**
  * This is NOT an opmode.
@@ -24,7 +25,7 @@ import org.firstinspires.ftc.teamcode.GamepadValuesReturn;
  *   As the arm servo approaches 0, the arm position moves up (away from the floor).
  *   As the claw servo approaches 0, the claw opens up (drops the game element).
  */
-public class Hardware
+public class Hardware extends LinearOpMode
 {
     // Public OpMode members
     public DcMotor frontLeftMotor  = null;
@@ -43,7 +44,14 @@ public class Hardware
     HardwareMap hwMap              = null;
     private ElapsedTime period     = new ElapsedTime();
 
+    final double ARM_DOWN_POWER    = -0.30;
+    final long WAIT                = 1000;
+
     /* Initialize standard Hardware interfaces */
+    public void runOpMode()
+    {
+
+    }
     public void init(HardwareMap ahwMap)
     {
         // save reference to HW Map
@@ -113,6 +121,11 @@ public class Hardware
 
         while (frontLeftMotor.isBusy() || frontRightMotor.isBusy() || backLeftMotor.isBusy() || backRightMotor.isBusy()) {
             // wait until motors reach target position
+            telemetry.addData("frontLeftMotor:", frontLeftMotor.getCurrentPosition());
+            telemetry.addData("frontRightMotor:", frontRightMotor.getCurrentPosition());
+            telemetry.addData("backLeftMotor:", backLeftMotor.getCurrentPosition());
+            telemetry.addData("backRightMotor:", backRightMotor.getCurrentPosition());
+            //telemetry.update();
         }
 
         motorPower.stop(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
@@ -204,6 +217,37 @@ public class Hardware
 
         motorPower.calcAndSetMotorPower(gamepad1LeftX, gamepad1LeftY, gamepad1RightX,
                 frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
+    }
+
+    public void holdDownArm(int curPos) throws InterruptedException {
+        curPos = -1; // if -1 gets returned then treat it as an error
+
+        arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        while (!touchSensor.isPressed()) {
+            arm.setPower(ARM_DOWN_POWER);
+        }
+
+        if (touchSensor.isPressed()) {
+            // keep arm down before firing
+            arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            curPos = arm.getCurrentPosition();
+            arm.setTargetPosition(curPos + 650);
+            arm.setPower(ARM_DOWN_POWER);
+        }
+
+        waitForTick(WAIT);
+    }
+
+    public void fireArm(int curPos) throws InterruptedException {
+        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        arm.setTargetPosition(curPos - 500);
+        arm.setPower(ARM_DOWN_POWER);
+
+        waitForTick(WAIT);
     }
 
     /***
