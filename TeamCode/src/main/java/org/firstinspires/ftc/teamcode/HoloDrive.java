@@ -37,8 +37,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 
 /**
  * Holonomic Drive
@@ -51,21 +49,19 @@ public class HoloDrive extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private Hardware robot = new Hardware();
 
+    final double ARM_DOWN_POWER = -0.30;
+
+    boolean runUsingEncoder     = true;
+
     @Override
     public void runOpMode() throws InterruptedException {
-        final double ARM_DOWN_POWER = -0.30;
-
-        boolean runUsingEncoder     = true;
-
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-
-        robot.init(hardwareMap);
-
-        TouchSensor touchSensor = hardwareMap.touchSensor.get("sensor_touch");
+        robot.init(hardwareMap, telemetry);
 
         robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.loader.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -90,7 +86,7 @@ public class HoloDrive extends LinearOpMode {
                 }
 
                 robot.arm.setPower(ARM_DOWN_POWER);
-            } else if (touchSensor.isPressed()) {
+            } else if (robot.touchSensor.isPressed()) {
                 if (runUsingEncoder) {
                     robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -101,7 +97,7 @@ public class HoloDrive extends LinearOpMode {
 
                 int curPos = robot.arm.getCurrentPosition();
 
-                robot.arm.setTargetPosition(curPos - 500);
+                robot.arm.setTargetPosition(curPos - 500); // TODO: switch this to use robot.holdDownArm();
 
                 robot.arm.setPower(-0.3);
             }

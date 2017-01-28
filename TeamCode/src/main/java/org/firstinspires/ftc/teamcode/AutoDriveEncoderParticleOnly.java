@@ -64,7 +64,7 @@ public class AutoDriveEncoderParticleOnly extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot.init(hardwareMap);
+        robot.init(hardwareMap, telemetry);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -78,7 +78,6 @@ public class AutoDriveEncoderParticleOnly extends LinearOpMode {
 
         // hold down arm before firing
         robot.holdDownArm(curPos);
-        robot.waitForTick(WAIT);
 
         // fire ball one
         robot.fireArm(curPos);

@@ -35,7 +35,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -50,13 +49,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="ADE - Particles and Cap Ball", group="Linear Opmode")
-public class AutoDriveEncoderParticleCap extends LinearOpMode {
+@Autonomous(name="ADE - Full", group="Linear Opmode")
+public class AutoDriveEncoderFull extends LinearOpMode {
 
     /* Declare OpMode members. */
     Hardware robot = new Hardware();
 
-    final long WAIT             = 1000;
+    final long WAIT = 1000;
 
     private int curPos;
 
@@ -65,7 +64,7 @@ public class AutoDriveEncoderParticleCap extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot.init(hardwareMap);
+        robot.init(hardwareMap, telemetry);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -102,7 +101,8 @@ public class AutoDriveEncoderParticleCap extends LinearOpMode {
         robot.hAutoDriveEncoder("forward", 0.8f, 4 * ANDYMARK_TICKS_PER_REV);
 
         // to close beacon
-        /*robot.hAutoDriveEncoder("forward", 0.8f, 4 * ANDYMARK_TICKS_PER_REV);
+        robot.hAutoDriveEncoder("forward", 0.8f, 4 * ANDYMARK_TICKS_PER_REV);
+        robot.rangeSensor.getRawLightDetected()
 
         // to close beacon
         robot.hAutoDriveEncoder("backward", 0.8f, 2 * ANDYMARK_TICKS_PER_REV);
@@ -113,6 +113,6 @@ public class AutoDriveEncoderParticleCap extends LinearOpMode {
         robot.hAutoDriveEncoder("backward", 0.8f, 1 * ANDYMARK_TICKS_PER_REV);
         robot.hAutoDriveEncoder("counterclockwise", 0.2f, 1 * ANDYMARK_TICKS_PER_REV);
         robot.hAutoDriveEncoder("left", 0.8f, 1 * ANDYMARK_TICKS_PER_REV);
-        robot.hAutoDriveEncoder("forward", 0.5f, 3 * ANDYMARK_TICKS_PER_REV);*/
+        robot.hAutoDriveEncoder("forward", 0.5f, 3 * ANDYMARK_TICKS_PER_REV);
     }
 }

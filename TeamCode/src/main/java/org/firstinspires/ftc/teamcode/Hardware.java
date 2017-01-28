@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
-
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 /**
  * This is NOT an opmode.
@@ -25,37 +27,38 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  *   As the arm servo approaches 0, the arm position moves up (away from the floor).
  *   As the claw servo approaches 0, the claw opens up (drops the game element).
  */
-public class Hardware extends LinearOpMode
+public class Hardware
 {
     // Public OpMode members
-    public DcMotor frontLeftMotor  = null;
-    public DcMotor frontRightMotor = null;
-    public DcMotor backLeftMotor   = null;
-    public DcMotor backRightMotor  = null;
+    public DcMotor frontLeftMotor        = null;
+    public DcMotor frontRightMotor       = null;
+    public DcMotor backLeftMotor         = null;
+    public DcMotor backRightMotor        = null;
 
-    public DcMotor arm             = null;
-    public DcMotor loader          = null;
+    public DcMotor arm                   = null;
+    public DcMotor loader                = null;
 
-    MotorPowerCalc motorPower      = new MotorPowerCalc();
+    public MotorPowerCalc motorPower     = new MotorPowerCalc();
 
-    TouchSensor touchSensor        = null;
+    public TouchSensor touchSensor       = null;
+    public ColorSensor beaconColorSensor = null;
+    public ColorSensor lineColorSensor   = null;
+    //public ModernRoboticsI2cRangeSensor rangeSensor    = null;
 
-    // Local OpMode members
-    HardwareMap hwMap              = null;
-    private ElapsedTime period     = new ElapsedTime();
+    HardwareMap hwMap                    = null;
+    private ElapsedTime period           = new ElapsedTime();
+    private Telemetry hwTelemetry        = null;
 
-    final double ARM_DOWN_POWER    = -0.30;
-    final long WAIT                = 1000;
+    final double ARM_DOWN_POWER          = -0.30;
+    final long WAIT                      = 1000;
 
-    /* Initialize standard Hardware interfaces */
-    public void runOpMode()
-    {
-
-    }
-    public void init(HardwareMap ahwMap)
+    public void init(HardwareMap ahwMap, Telemetry telem)
     {
         // save reference to HW Map
         hwMap = ahwMap;
+
+        // save telemetry object
+        hwTelemetry = telem;
 
         // Define and Initialize Motors
         frontLeftMotor  = hwMap.dcMotor.get("frontLeft");
@@ -81,7 +84,10 @@ public class Hardware extends LinearOpMode
         /*arm = hwMap.servo.get("arm");
         arm.setPosition(ARM_HOME);*/
 
-        touchSensor = hwMap.touchSensor.get("sensor_touch");
+        touchSensor       = hwMap.touchSensor.get("sensor_touch");
+        beaconColorSensor = hwMap.colorSensor.get("sensor_color_beacon");
+        lineColorSensor   = hwMap.colorSensor.get("sensor_color_line");
+        //rangeSensor = hwMap.get(ModernRoboticsI2cRangeSensor.class, "sensor_range");
     }
 
     private void autoDriveEncoder(float gamepad1LeftX, float gamepad1LeftY, float gamepad1RightX, int pos, String dir)
@@ -94,15 +100,15 @@ public class Hardware extends LinearOpMode
 
         // Set target position of all motors
         if (dir.equals("forward") || dir.equals("backward")) {
-            frontLeftMotor.setTargetPosition(-pos);
-            frontRightMotor.setTargetPosition(pos);
-            backLeftMotor.setTargetPosition(-pos);
-            backRightMotor.setTargetPosition(pos);
-        } else if (dir.equals("right") || dir.equals("left")) {
-            frontLeftMotor.setTargetPosition(-pos);
+            frontLeftMotor.setTargetPosition(pos);
             frontRightMotor.setTargetPosition(-pos);
             backLeftMotor.setTargetPosition(pos);
-            backRightMotor.setTargetPosition(pos);
+            backRightMotor.setTargetPosition(-pos);
+        } else if (dir.equals("right") || dir.equals("left")) {
+            frontLeftMotor.setTargetPosition(pos);
+            frontRightMotor.setTargetPosition(pos);
+            backLeftMotor.setTargetPosition(-pos);
+            backRightMotor.setTargetPosition(-pos);
         } else if (dir.equals("clockwise") || dir.equals("counterclockwise")) {
             frontLeftMotor.setTargetPosition(pos);
             frontRightMotor.setTargetPosition(pos);
@@ -121,11 +127,11 @@ public class Hardware extends LinearOpMode
 
         while (frontLeftMotor.isBusy() || frontRightMotor.isBusy() || backLeftMotor.isBusy() || backRightMotor.isBusy()) {
             // wait until motors reach target position
-            telemetry.addData("frontLeftMotor:", frontLeftMotor.getCurrentPosition());
-            telemetry.addData("frontRightMotor:", frontRightMotor.getCurrentPosition());
-            telemetry.addData("backLeftMotor:", backLeftMotor.getCurrentPosition());
-            telemetry.addData("backRightMotor:", backRightMotor.getCurrentPosition());
-            //telemetry.update();
+            hwTelemetry.addData("frontLeftMotor:", frontLeftMotor.getCurrentPosition());
+            hwTelemetry.addData("frontRightMotor:", frontRightMotor.getCurrentPosition());
+            hwTelemetry.addData("backLeftMotor:", backLeftMotor.getCurrentPosition());
+            hwTelemetry.addData("backRightMotor:", backRightMotor.getCurrentPosition());
+            hwTelemetry.update();
         }
 
         motorPower.stop(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
@@ -171,7 +177,7 @@ public class Hardware extends LinearOpMode
     }
 
     /*
-     * hAutoDriveEncoder = human (readable) auto drive (with) encoders
+     * hAutoDriveEncoder = human (readable auto drive (with) encoders
      *
      * Programs should use this method to drive autonomously with encoders, don't call autoDriveEncoder() directly
      */
@@ -228,15 +234,12 @@ public class Hardware extends LinearOpMode
             arm.setPower(ARM_DOWN_POWER);
         }
 
-        if (touchSensor.isPressed()) {
-            // keep arm down before firing
-            arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-            curPos = arm.getCurrentPosition();
-            arm.setTargetPosition(curPos + 650);
-            arm.setPower(ARM_DOWN_POWER);
-        }
+        // keep arm down before firing
+        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        curPos = arm.getCurrentPosition();
+        arm.setTargetPosition(curPos + 650);
+        arm.setPower(ARM_DOWN_POWER);
 
         waitForTick(WAIT);
     }
@@ -244,7 +247,7 @@ public class Hardware extends LinearOpMode
     public void fireArm(int curPos) throws InterruptedException {
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        arm.setTargetPosition(curPos - 500);
+        arm.setTargetPosition(curPos - 650); // 500
         arm.setPower(ARM_DOWN_POWER);
 
         waitForTick(WAIT);

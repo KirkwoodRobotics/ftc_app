@@ -59,7 +59,7 @@ public class AutoDriveTime extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot.init(hardwareMap);
+        robot.init(hardwareMap, telemetry);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
