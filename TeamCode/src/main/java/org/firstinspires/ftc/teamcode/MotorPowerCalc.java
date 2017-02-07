@@ -17,10 +17,10 @@ public class MotorPowerCalc {
                                      DcMotor backLeftMotor, DcMotor backRightMotor)
     {
         // Calculate motor power
-        frontLeftPower  = -gamepad1LeftY - gamepad1LeftX - gamepad1RightX;
+        frontLeftPower  = gamepad1LeftY - gamepad1LeftX + gamepad1RightX;
         frontRightPower = gamepad1LeftY - gamepad1LeftX - gamepad1RightX;
-        backLeftPower   = -gamepad1LeftY + gamepad1LeftX - gamepad1RightX;
-        backRightPower  = gamepad1LeftY + gamepad1LeftX - gamepad1RightX;
+        backLeftPower   = gamepad1LeftY + gamepad1LeftX - gamepad1RightX;
+        backRightPower  = gamepad1LeftY + gamepad1LeftX + gamepad1RightX;
 
         // Clip motor power values so they stay within the range -1 to 1
         frontLeftPower  = Range.clip(frontLeftPower, -1, 1);
@@ -29,10 +29,10 @@ public class MotorPowerCalc {
         backRightPower  = Range.clip(backRightPower, -1, 1);
 
         // Set power to all drive motors
-        frontLeftMotor.setPower(frontLeftPower);
+        frontLeftMotor.setPower(-frontLeftPower);
         frontRightMotor.setPower(frontRightPower);
         backLeftMotor.setPower(backLeftPower);
-        backRightMotor.setPower(backRightPower);
+        backRightMotor.setPower(-backRightPower);
     }
 
     public void stop(DcMotor frontLeftMotor, DcMotor frontRightMotor,

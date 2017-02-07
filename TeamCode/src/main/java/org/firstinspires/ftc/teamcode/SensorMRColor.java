@@ -56,53 +56,52 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 @Autonomous(name = "Sensor: MR Color", group = "Sensor")
 public class SensorMRColor extends LinearOpMode {
 
-  ColorSensor colorSensor;    // Hardware Device Object
+    ColorSensor colorSensor;    // Hardware Device Object
 
-  @Override
-  public void runOpMode() {
+    @Override
+    public void runOpMode() {
+        // hsvValues is an array that will hold the hue, saturation, and value information.
+        float hsvValues[] = {0F,0F,0F};
 
-    // hsvValues is an array that will hold the hue, saturation, and value information.
-    float hsvValues[] = {0F,0F,0F};
+        // values is a reference to the hsvValues array.
+        final float values[] = hsvValues;
 
-    // values is a reference to the hsvValues array.
-    final float values[] = hsvValues;
+        // get a reference to the RelativeLayout so we can change the background
+        // color of the Robot Controller app to match the hue detected by the RGB sensor.
+        final View relativeLayout = ((Activity) hardwareMap.appContext).findViewById(R.id.RelativeLayout);
 
-    // get a reference to the RelativeLayout so we can change the background
-    // color of the Robot Controller app to match the hue detected by the RGB sensor.
-    final View relativeLayout = ((Activity) hardwareMap.appContext).findViewById(R.id.RelativeLayout);
+        // get a reference to our ColorSensor object.
+        colorSensor = hardwareMap.colorSensor.get("sensor_color_beacon");
 
-    // get a reference to our ColorSensor object.
-    colorSensor = hardwareMap.colorSensor.get("sensor_color");
+        // Set the LED in the beginning
+        colorSensor.enableLed(true);
 
-    // Set the LED in the beginning
-    colorSensor.enableLed(true);
+        // wait for the start button to be pressed.
+        waitForStart();
 
-    // wait for the start button to be pressed.
-    waitForStart();
+        // while the op mode is active, loop and read the RGB data.
+        // Note we use opModeIsActive() as our loop condition because it is an interruptible method.
+        while (opModeIsActive()) {
+            // convert the RGB values to HSV values.
+            Color.RGBToHSV(colorSensor.red() * 8, colorSensor.green() * 8, colorSensor.blue() * 8, hsvValues);
 
-    // while the op mode is active, loop and read the RGB data.
-    // Note we use opModeIsActive() as our loop condition because it is an interruptible method.
-    while (opModeIsActive()) {
-        // convert the RGB values to HSV values.
-        Color.RGBToHSV(colorSensor.red() * 8, colorSensor.green() * 8, colorSensor.blue() * 8, hsvValues);
+            // send the info back to driver station using telemetry function.
+            telemetry.addData("Alpha", colorSensor.alpha());
+            telemetry.addData("Red  ", colorSensor.red());
+            telemetry.addData("Green", colorSensor.green());
+            telemetry.addData("Blue ", colorSensor.blue());
+            telemetry.addData("Hue", hsvValues[0]);
 
-        // send the info back to driver station using telemetry function.
-        telemetry.addData("Clear", colorSensor.alpha());
-        telemetry.addData("Red  ", colorSensor.red());
-        telemetry.addData("Green", colorSensor.green());
-        telemetry.addData("Blue ", colorSensor.blue());
-        telemetry.addData("Hue", hsvValues[0]);
+            // change the background color to match the color detected by the RGB sensor.
+            // pass a reference to the hue, saturation, and value array as an argument
+            // to the HSVToColor method.
+            relativeLayout.post(new Runnable() {
+                public void run() {
+                    relativeLayout.setBackgroundColor(Color.HSVToColor(0xff, values));
+                }
+            });
 
-        // change the background color to match the color detected by the RGB sensor.
-        // pass a reference to the hue, saturation, and value array as an argument
-        // to the HSVToColor method.
-        relativeLayout.post(new Runnable() {
-        public void run() {
-            relativeLayout.setBackgroundColor(Color.HSVToColor(0xff, values));
+            telemetry.update();
         }
-        });
-
-        telemetry.update();
     }
-  }
 }

@@ -35,6 +35,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -49,8 +52,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="ADE - Full", group="Linear Opmode")
-public class AutoDriveEncoderFull extends LinearOpMode {
+@Autonomous(name="ADE - Full", group="Iterative Opmode")
+public class AutoDriveEncoderFull extends OpMode {
 
     /* Declare OpMode members. */
     Hardware robot = new Hardware();
@@ -59,60 +62,139 @@ public class AutoDriveEncoderFull extends LinearOpMode {
 
     private int curPos;
 
-    public final static int TETRIX_TICKS_PER_REV   = 1440;
-    public final static int ANDYMARK_TICKS_PER_REV = 1120;
+    boolean redTeam = true;
+    boolean pushed  = false;
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void init() {
         robot.init(hardwareMap, telemetry);
+
+        robot.beaconColorSensor.enableLed(true);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+    }
 
-        waitForStart(); // Wait for the game to start (driver presses PLAY)
+    /*
+    * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
+    *
+    * TODO: switched this all around so I could get init_loop() now IDK what I needed it for
+    */
+    @Override
+    public void init_loop() {
+        robot.capBallMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
 
-        // start with arm pointing towards center vortex
+    /*
+     * Code to run ONCE when the driver hits PLAY
+     *
+     * Using this like a linear opmode
+     *
+     * start with arm pointing towards center vortex
+     */
+    @Override
+    public void start()  {
+        try {
+            // to firing position
+            robot.hAutoDriveEncoder("forward", 0.5f, 1450);
 
-        // to firing position
-        robot.hAutoDriveEncoder("forward", 0.5f, 1450);
+            // hold down arm before firing
+            robot.holdDownArm(curPos);
+            robot.waitForTick(WAIT);
 
-        // hold down arm before firing
-        robot.holdDownArm(curPos);
+            // fire ball one
+            robot.fireArm(curPos);
+            robot.waitForTick(WAIT);
+
+            // hold down arm before loading
+            robot.holdDownArm(curPos);
+            robot.waitForTick(2000);
+
+            // load ball two
+            robot.loader.setPower(1);
+            robot.waitForTick(3500);
+            robot.loader.setPower(0);
+            robot.waitForTick(WAIT);
+
+            // fire ball two
+            robot.fireArm(curPos);
+
+            // to cap ball
+            robot.hAutoDriveEncoder("forward", 0.8f, 4 * robot.ANDYMARK_TICKS_PER_REV);
+
+            // to far beacon
+            robot.hAutoDriveEncoder("forward", 0.8f, 4 * robot.ANDYMARK_TICKS_PER_REV);
+
+            followLine();
+            pushBeacon();
+
+            // to close beacon
+            robot.hAutoDriveEncoder("backward", 0.8f, 2 * robot.ANDYMARK_TICKS_PER_REV);
+            robot.hAutoDriveEncoder("left", 0.8f, 4 * robot.ANDYMARK_TICKS_PER_REV);
+            robot.hAutoDriveEncoder("forward", 0.8f, 2 * robot.ANDYMARK_TICKS_PER_REV);
+
+            followLine();
+            pushBeacon();
+
+            // to corner vortex
+            robot.hAutoDriveEncoder("backward", 0.8f, 1 * robot.ANDYMARK_TICKS_PER_REV);
+            robot.hAutoDriveEncoder("counterclockwise", 0.2f, 1 * robot.ANDYMARK_TICKS_PER_REV);
+            robot.hAutoDriveEncoder("left", 0.8f, 1 * robot.ANDYMARK_TICKS_PER_REV);
+            robot.hAutoDriveEncoder("forward", 0.5f, 3 * robot.ANDYMARK_TICKS_PER_REV);
+        } catch (InterruptedException err) {
+            telemetry.addData("Error", "InterruptedException");
+            telemetry.update();
+        }
+    }
+
+    public void followLine() {
+        // TODO: detect and follow line
+    }
+
+    public void pushBeacon() throws InterruptedException {
+        // move to left beacon button
+        robot.hAutoDriveEncoder("left", 0.4f, 400); // distance untested
+
+        // detect left color and push button if available
         robot.waitForTick(WAIT);
+        push();
 
-        // fire ball one
-        robot.fireArm(curPos);
-        robot.waitForTick(WAIT);
+        if (!pushed) { // if it didn't push it on the left button, try the right
+            // move to right beacon button
+            robot.hAutoDriveEncoder("right", 0.4f, 400); // distance untested
 
-        // hold down arm before loading
-        robot.holdDownArm(curPos);
-        robot.waitForTick(2000);
+            // detect right color and push button if available
+            push();
+        }
+    }
 
-        // load ball two
-        robot.loader.setPower(1);
-        robot.waitForTick(3500);
-        robot.loader.setPower(0);
-        robot.waitForTick(WAIT);
+    public void push() throws InterruptedException {
+        if (redTeam) {
+            if (robot.beaconColorSensor.red() > robot.beaconColorSensor.blue()) { // if red, push button
+                robot.hAutoDriveEncoder("forward", 0.3f, 200); // distance untested
+                pushed = true;
+            }
+        } else {
+            if (robot.beaconColorSensor.blue() > robot.beaconColorSensor.red()) { // if red, push button
+                robot.hAutoDriveEncoder("forward", 0.3f, 200); // distance untested
+                pushed = true;
+            }
+        }
+    }
 
-        // fire ball two
-        robot.fireArm(curPos);
+    /*
+     * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
+     */
+    @Override
+    public void loop() {
 
-        // to cap ball
-        robot.hAutoDriveEncoder("forward", 0.8f, 4 * ANDYMARK_TICKS_PER_REV);
+    }
 
-        // to close beacon
-        robot.hAutoDriveEncoder("forward", 0.8f, 4 * ANDYMARK_TICKS_PER_REV);
-        robot.rangeSensor.getRawLightDetected()
+    /*
+     * Code to run ONCE after the driver hits STOP
+     */
+    @Override
+    public void stop() {
 
-        // to close beacon
-        robot.hAutoDriveEncoder("backward", 0.8f, 2 * ANDYMARK_TICKS_PER_REV);
-        robot.hAutoDriveEncoder("left", 0.8f, 4* ANDYMARK_TICKS_PER_REV);
-        robot.hAutoDriveEncoder("forward", 0.8f, 2 * ANDYMARK_TICKS_PER_REV);
-
-        // to corner vortex
-        robot.hAutoDriveEncoder("backward", 0.8f, 1 * ANDYMARK_TICKS_PER_REV);
-        robot.hAutoDriveEncoder("counterclockwise", 0.2f, 1 * ANDYMARK_TICKS_PER_REV);
-        robot.hAutoDriveEncoder("left", 0.8f, 1 * ANDYMARK_TICKS_PER_REV);
-        robot.hAutoDriveEncoder("forward", 0.5f, 3 * ANDYMARK_TICKS_PER_REV);
     }
 }

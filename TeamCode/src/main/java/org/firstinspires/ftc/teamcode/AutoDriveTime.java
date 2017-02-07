@@ -66,7 +66,7 @@ public class AutoDriveTime extends LinearOpMode {
 
         waitForStart(); // Wait for the game to start (driver presses PLAY)
 
-        robot.hAutoDrive("right", 3300); // "right", start with battery side towards cap ball
+        //robot.hAutoDrive("right", 3300); // "right", start with battery side towards cap ball
         //robot.hAutoDrive("rotateClockwise", 700);
         //robot.hAutoDrive("forward", 2400);
     }

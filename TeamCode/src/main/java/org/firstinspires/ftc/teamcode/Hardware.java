@@ -37,6 +37,7 @@ public class Hardware
 
     public DcMotor arm                   = null;
     public DcMotor loader                = null;
+    public DcMotor capBallMotor          = null;
 
     public MotorPowerCalc motorPower     = new MotorPowerCalc();
 
@@ -51,6 +52,9 @@ public class Hardware
 
     final double ARM_DOWN_POWER          = -0.30;
     final long WAIT                      = 1000;
+
+    public final static int TETRIX_TICKS_PER_REV   = 1440;
+    public final static int ANDYMARK_TICKS_PER_REV = 1120;
 
     public void init(HardwareMap ahwMap, Telemetry telem)
     {
@@ -68,6 +72,7 @@ public class Hardware
 
         arm             = hwMap.dcMotor.get("arm");
         loader          = hwMap.dcMotor.get("loader");
+        //capBallMotor    = hwMap.dcMotor.get("capBall");
 
         // Set all motors to zero power
         frontLeftMotor.setPower(0);
@@ -79,6 +84,7 @@ public class Hardware
         loader.setPower(0);
 
         loader.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //capBallMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // Define and initialize servos.
         /*arm = hwMap.servo.get("arm");
@@ -105,9 +111,9 @@ public class Hardware
             backLeftMotor.setTargetPosition(pos);
             backRightMotor.setTargetPosition(-pos);
         } else if (dir.equals("right") || dir.equals("left")) {
-            frontLeftMotor.setTargetPosition(pos);
+            frontLeftMotor.setTargetPosition(- pos);
             frontRightMotor.setTargetPosition(pos);
-            backLeftMotor.setTargetPosition(-pos);
+            backLeftMotor.setTargetPosition(pos);
             backRightMotor.setTargetPosition(-pos);
         } else if (dir.equals("clockwise") || dir.equals("counterclockwise")) {
             frontLeftMotor.setTargetPosition(pos);
@@ -138,46 +144,7 @@ public class Hardware
     }
 
     /*
-     * hAutoDrive = human (readable) auto drive (without encoders)
-     *
-     * Programs should use this method to drive autonomously, don't call autoDrive() directly
-     */
-    public void hAutoDrive(String dir, int periodMs) throws InterruptedException
-    {
-        switch (dir) {
-            case "forward":
-                motorPower.calcAndSetMotorPower(0, 1, 0,
-                        frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
-                break;
-            case "backward":
-                motorPower.calcAndSetMotorPower(0, -1, 0,
-                        frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
-                break;
-            case "right":
-                motorPower.calcAndSetMotorPower(1, 0, 0,
-                        frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
-                break;
-            case "left":
-                motorPower.calcAndSetMotorPower(-1, 0, 0,
-                        frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
-                break;
-            case "rotateClockwise":
-                motorPower.calcAndSetMotorPower(0, 0, -1,
-                    frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
-                break;
-            default:
-                motorPower.calcAndSetMotorPower(0, 0, 0,
-                        frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
-                break;
-        }
-
-        waitForTick(periodMs);
-        motorPower.calcAndSetMotorPower(0, 0, 0,
-                frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
-    }
-
-    /*
-     * hAutoDriveEncoder = human (readable auto drive (with) encoders
+     * hAutoDriveEncoder = human readable auto drive (with) encoders
      *
      * Programs should use this method to drive autonomously with encoders, don't call autoDriveEncoder() directly
      */
@@ -185,24 +152,24 @@ public class Hardware
     {
         switch (dir) {
             case "forward":
-                autoDriveEncoder(power, 0, 0, pos, "forward");
+                autoDriveEncoder(power, 0, 0, -pos, "forward");
                 break;
             case "backward":
-                autoDriveEncoder(power, 0, 0, -pos, "backward");
+                autoDriveEncoder(power, 0, 0, pos, "backward");
                 break;
 
             case "right":
-                autoDriveEncoder(0, power, 0, pos, "right");
+                autoDriveEncoder(0, power, 0, -pos, "right");
                 break;
             case "left":
-                autoDriveEncoder(0, power, 0, -pos, "left");
+                autoDriveEncoder(0, power, 0, pos, "left");
                 break;
 
             case "clockwise":
-                autoDriveEncoder(0, 0, power, pos, "clockwise");
+                autoDriveEncoder(0, 0, power, -pos, "clockwise");
                 break;
             case "counterclockwise":
-                autoDriveEncoder(0, 0, power, -pos, "counterclockwise");
+                autoDriveEncoder(0, 0, power, pos, "counterclockwise");
                 break;
 
             default:
@@ -251,6 +218,16 @@ public class Hardware
         arm.setPower(ARM_DOWN_POWER);
 
         waitForTick(WAIT);
+    }
+
+    public void liftCapBall() {
+        capBallMotor.setTargetPosition(3 * ANDYMARK_TICKS_PER_REV);
+        capBallMotor.setPower(0.4);
+    }
+
+    public void lowerCapBall() {
+        capBallMotor.setTargetPosition(-3 * ANDYMARK_TICKS_PER_REV);
+        capBallMotor.setPower(0.4);
     }
 
     /***

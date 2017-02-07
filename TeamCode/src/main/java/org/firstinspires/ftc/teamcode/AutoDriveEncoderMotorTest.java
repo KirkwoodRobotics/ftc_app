@@ -35,6 +35,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -49,58 +50,40 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="ADE - Particles Only", group="Linear Opmode")
-public class AutoDriveEncoderParticleOnly extends LinearOpMode {
+@Autonomous(name="ADE - Motor Test", group="Linear Opmode")
+public class AutoDriveEncoderMotorTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     Hardware robot = new Hardware();
 
-    final long WAIT             = 1000;
-
-    private int curPos;
-
-    public final static int TETRIX_TICKS_PER_REV = 1440;
-    public final static int ANDYMARK_TICKS_PER_REV = 1120;
-
     @Override
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap, telemetry);
+
+        robot.frontLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.frontRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.backRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         waitForStart(); // Wait for the game to start (driver presses PLAY)
 
-        // start with arm pointing towards center vortex
+        robot.frontLeftMotor.setPower(0.3);
+        robot.frontLeftMotor.setTargetPosition(robot.ANDYMARK_TICKS_PER_REV);
+        robot.waitForTick(robot.WAIT);
 
-        // to firing position 1450
+        robot.frontRightMotor.setPower(0.3);
+        robot.frontRightMotor.setTargetPosition(robot.ANDYMARK_TICKS_PER_REV);
+        robot.waitForTick(robot.WAIT);
 
-        //robot.hAutoDriveEncoder("forward", 0.6f, 2 * ANDYMARK_TICKS_PER_REV);
+        robot.backLeftMotor.setPower(0.3);
+        robot.backLeftMotor.setTargetPosition(robot.ANDYMARK_TICKS_PER_REV);
+        robot.waitForTick(robot.WAIT);
 
-        robot.hAutoDriveEncoder("right", 0.6f, ANDYMARK_TICKS_PER_REV);
-        robot.hAutoDriveEncoder("left", 0.6f, ANDYMARK_TICKS_PER_REV);
-
-
-
-        // hold down arm before firing
-        /*robot.holdDownArm(curPos);
-
-        // fire ball one
-        robot.fireArm(curPos);
-        robot.waitForTick(WAIT);
-
-        // hold down arm before loading
-        robot.holdDownArm(curPos);
-
-        // load ball two
-        if (robot.touchSensor.isPressed()) { // only load ball if touch sensor is pressed so it does not get stuck
-            robot.loader.setPower(1);
-            robot.waitForTick(3500);
-            robot.loader.setPower(0);
-            robot.waitForTick(WAIT);
-
-            // fire ball two
-            robot.fireArm(curPos);
-        }*/
+        robot.backRightMotor.setPower(0.3);
+        robot.backRightMotor.setTargetPosition(robot.ANDYMARK_TICKS_PER_REV);
+        robot.waitForTick(robot.WAIT);
     }
 }
