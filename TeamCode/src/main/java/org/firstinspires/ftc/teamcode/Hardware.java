@@ -37,7 +37,7 @@ public class Hardware
 
     public DcMotor arm                   = null;
     public DcMotor loader                = null;
-    public DcMotor capBallMotor          = null;
+    public DcMotor capBallLifter         = null;
 
     public MotorPowerCalc motorPower     = new MotorPowerCalc();
 
@@ -53,7 +53,10 @@ public class Hardware
     final double ARM_DOWN_POWER          = -0.30;
     final long WAIT                      = 1000;
 
-    public final static int TETRIX_TICKS_PER_REV   = 1440;
+    public boolean redTeam;
+    public boolean leftPos;
+    public boolean pushed                = false;
+
     public final static int ANDYMARK_TICKS_PER_REV = 1120;
 
     public void init(HardwareMap ahwMap, Telemetry telem)
@@ -72,7 +75,7 @@ public class Hardware
 
         arm             = hwMap.dcMotor.get("arm");
         loader          = hwMap.dcMotor.get("loader");
-        //capBallMotor    = hwMap.dcMotor.get("capBall");
+        capBallLifter   = hwMap.dcMotor.get("capBallLifter");
 
         // Set all motors to zero power
         frontLeftMotor.setPower(0);
@@ -84,11 +87,7 @@ public class Hardware
         loader.setPower(0);
 
         loader.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        //capBallMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        // Define and initialize servos.
-        /*arm = hwMap.servo.get("arm");
-        arm.setPosition(ARM_HOME);*/
+        capBallLifter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         touchSensor       = hwMap.touchSensor.get("sensor_touch");
         beaconColorSensor = hwMap.colorSensor.get("sensor_color_beacon");
@@ -180,9 +179,9 @@ public class Hardware
 
     public void teleDrive(Gamepad gamepad1)
     {
-        double gamepad1LeftY = -gamepad1.left_stick_y;
-        double gamepad1LeftX = gamepad1.left_stick_x;
-        double gamepad1RightX = -gamepad1.right_stick_x; // reversed
+        double gamepad1LeftY = gamepad1.left_stick_x;
+        double gamepad1LeftX = gamepad1.left_stick_y;
+        double gamepad1RightX = gamepad1.right_stick_x;
 
         gamepad1LeftY = Math.pow((Math.tanh(gamepad1LeftY) / Math.tanh(1)), 3);
         gamepad1LeftX = Math.pow((Math.tanh(gamepad1LeftX) / Math.tanh(1)), 3);
@@ -220,14 +219,45 @@ public class Hardware
         waitForTick(WAIT);
     }
 
-    public void liftCapBall() {
-        capBallMotor.setTargetPosition(3 * ANDYMARK_TICKS_PER_REV);
-        capBallMotor.setPower(0.4);
+    public void checkColor() throws InterruptedException {
+        if (beaconColorSensor.blue() > beaconColorSensor.red()) {
+            if (!redTeam) {
+                // it is probably blue, since we are on the blue team push the button
+
+                hAutoDriveEncoder("forward", 0.3f, 200); // distance untested
+
+                pushed = true;
+            }
+        } else {
+            if (redTeam) {
+                // it is probably red, since we are on the red team push the button
+
+                hAutoDriveEncoder("forward", 0.3f, 200); // distance untested
+
+                pushed = true;
+            }
+        }
+
+        hwTelemetry.addData("Red  ", beaconColorSensor.red());
+        hwTelemetry.addData("Blue ", beaconColorSensor.blue());
+        hwTelemetry.addData("pushed", pushed);
+        hwTelemetry.update();
     }
 
-    public void lowerCapBall() {
-        capBallMotor.setTargetPosition(-3 * ANDYMARK_TICKS_PER_REV);
-        capBallMotor.setPower(0.4);
+    public void pushBeacon() throws InterruptedException {
+        // move to left beacon button
+       // hAutoDriveEncoder("left", 0.4f, 400); // distance untested
+
+        // detect left color and push button if correct color
+        checkColor();
+
+        if (!pushed) {
+            // move to right beacon button
+            // hAutoDriveEncoder("right", 0.4f, 400); // distance untested
+
+            // detect right color and push button if correct color
+            checkColor();
+        }
     }
 
     /***

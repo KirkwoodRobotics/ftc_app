@@ -105,8 +105,21 @@ public class HoloDrive extends LinearOpMode {
             // loader
             robot.loader.setPower(gamepad2.left_stick_y);
 
+            // cap ball lifter
+            if (gamepad2.right_trigger > 0) {
+                robot.capBallLifter.setPower(gamepad2.right_trigger);
+            } else if (gamepad2.left_trigger > 0) {
+                robot.capBallLifter.setPower(-gamepad2.left_trigger);
+            } else {
+                robot.capBallLifter.setPower(0);
+            }
+
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
             telemetry.update();
         }
+    }
+
+    public void liftCapBall(int curPos) {
+        // TODO: find correct encoder values
     }
 }

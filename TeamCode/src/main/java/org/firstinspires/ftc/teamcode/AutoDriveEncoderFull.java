@@ -56,14 +56,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class AutoDriveEncoderFull extends OpMode {
 
     /* Declare OpMode members. */
-    Hardware robot = new Hardware();
+    private Hardware robot = new Hardware();
 
-    final long WAIT = 1000;
+    private final long WAIT = 1000;
 
     private int curPos;
+    private int numPressed = 0;
 
-    boolean redTeam = true;
-    boolean pushed  = false;
+    private boolean pushed = false;
 
     @Override
     public void init() {
@@ -82,7 +82,48 @@ public class AutoDriveEncoderFull extends OpMode {
     */
     @Override
     public void init_loop() {
-        robot.capBallMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        try {
+            if (robot.touchSensor.isPressed()) {
+                switch (numPressed) {
+                    case 1:
+                        robot.redTeam = false;
+                        robot.leftPos = false;
+                        break;
+                    case 2:
+                        robot.leftPos = true;
+                        break;
+                    case 3:
+                        robot.redTeam = true;
+                        robot.leftPos = false;
+                        break;
+                    case 4:
+                        robot.leftPos = true;
+                        numPressed = 0;
+                        break;
+                }
+                numPressed++;
+
+                robot.waitForTick(500);
+            }
+
+            if (robot.leftPos) {
+                telemetry.addData("Position", "Left");
+            } else {
+                telemetry.addData("Position", "Right");
+            }
+
+            if (robot.redTeam) {
+                telemetry.addData("Team", "Red");
+            } else {
+                telemetry.addData("Team", "Blue");
+            }
+
+            telemetry.addData("Status", "init_loop()", numPressed);
+            telemetry.update();
+        } catch (InterruptedException err) {
+            telemetry.addData("Error", "InterruptedException");
+            telemetry.update();
+        }
     }
 
     /*
@@ -95,6 +136,8 @@ public class AutoDriveEncoderFull extends OpMode {
     @Override
     public void start()  {
         try {
+            //robot.pushBeacon();
+
             // to firing position
             robot.hAutoDriveEncoder("forward", 0.5f, 1450);
 
@@ -126,7 +169,7 @@ public class AutoDriveEncoderFull extends OpMode {
             robot.hAutoDriveEncoder("forward", 0.8f, 4 * robot.ANDYMARK_TICKS_PER_REV);
 
             followLine();
-            pushBeacon();
+            //robot.pushBeacon();
 
             // to close beacon
             robot.hAutoDriveEncoder("backward", 0.8f, 2 * robot.ANDYMARK_TICKS_PER_REV);
@@ -134,7 +177,7 @@ public class AutoDriveEncoderFull extends OpMode {
             robot.hAutoDriveEncoder("forward", 0.8f, 2 * robot.ANDYMARK_TICKS_PER_REV);
 
             followLine();
-            pushBeacon();
+            //robot.pushBeacon();
 
             // to corner vortex
             robot.hAutoDriveEncoder("backward", 0.8f, 1 * robot.ANDYMARK_TICKS_PER_REV);
@@ -149,37 +192,6 @@ public class AutoDriveEncoderFull extends OpMode {
 
     public void followLine() {
         // TODO: detect and follow line
-    }
-
-    public void pushBeacon() throws InterruptedException {
-        // move to left beacon button
-        robot.hAutoDriveEncoder("left", 0.4f, 400); // distance untested
-
-        // detect left color and push button if available
-        robot.waitForTick(WAIT);
-        push();
-
-        if (!pushed) { // if it didn't push it on the left button, try the right
-            // move to right beacon button
-            robot.hAutoDriveEncoder("right", 0.4f, 400); // distance untested
-
-            // detect right color and push button if available
-            push();
-        }
-    }
-
-    public void push() throws InterruptedException {
-        if (redTeam) {
-            if (robot.beaconColorSensor.red() > robot.beaconColorSensor.blue()) { // if red, push button
-                robot.hAutoDriveEncoder("forward", 0.3f, 200); // distance untested
-                pushed = true;
-            }
-        } else {
-            if (robot.beaconColorSensor.blue() > robot.beaconColorSensor.red()) { // if red, push button
-                robot.hAutoDriveEncoder("forward", 0.3f, 200); // distance untested
-                pushed = true;
-            }
-        }
     }
 
     /*

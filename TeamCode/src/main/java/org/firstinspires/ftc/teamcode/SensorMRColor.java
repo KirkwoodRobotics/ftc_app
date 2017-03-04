@@ -88,7 +88,6 @@ public class SensorMRColor extends LinearOpMode {
             // send the info back to driver station using telemetry function.
             telemetry.addData("Alpha", colorSensor.alpha());
             telemetry.addData("Red  ", colorSensor.red());
-            telemetry.addData("Green", colorSensor.green());
             telemetry.addData("Blue ", colorSensor.blue());
             telemetry.addData("Hue", hsvValues[0]);
 

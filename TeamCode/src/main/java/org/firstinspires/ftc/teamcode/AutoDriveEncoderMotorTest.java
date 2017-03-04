@@ -50,7 +50,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="ADE - Motor Test", group="Linear Opmode")
+@Autonomous(name="ADE - Motor Tester", group="Linear Opmode")
 public class AutoDriveEncoderMotorTest extends LinearOpMode {
 
     /* Declare OpMode members. */
