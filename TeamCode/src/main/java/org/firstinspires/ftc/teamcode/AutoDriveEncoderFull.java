@@ -99,7 +99,6 @@ public class AutoDriveEncoderFull extends OpMode {
                     case 4:
                         robot.leftPos = true;
                         numPressed = 0;
-                        break;
                 }
                 numPressed++;
 
@@ -139,7 +138,7 @@ public class AutoDriveEncoderFull extends OpMode {
             //robot.pushBeacon();
 
             // to firing position
-            robot.hAutoDriveEncoder("forward", 0.5f, 1450);
+            //robot.hAutoDriveEncoder("clockwise", 0.5f, 100); //1450
 
             // hold down arm before firing
             robot.holdDownArm(curPos);
@@ -163,7 +162,7 @@ public class AutoDriveEncoderFull extends OpMode {
             robot.fireArm(curPos);
 
             // to cap ball
-            robot.hAutoDriveEncoder("forward", 0.8f, 4 * robot.ANDYMARK_TICKS_PER_REV);
+            /*robot.hAutoDriveEncoder("forward", 0.8f, 4 * robot.ANDYMARK_TICKS_PER_REV);
 
             // to far beacon
             robot.hAutoDriveEncoder("forward", 0.8f, 4 * robot.ANDYMARK_TICKS_PER_REV);
@@ -183,7 +182,7 @@ public class AutoDriveEncoderFull extends OpMode {
             robot.hAutoDriveEncoder("backward", 0.8f, 1 * robot.ANDYMARK_TICKS_PER_REV);
             robot.hAutoDriveEncoder("counterclockwise", 0.2f, 1 * robot.ANDYMARK_TICKS_PER_REV);
             robot.hAutoDriveEncoder("left", 0.8f, 1 * robot.ANDYMARK_TICKS_PER_REV);
-            robot.hAutoDriveEncoder("forward", 0.5f, 3 * robot.ANDYMARK_TICKS_PER_REV);
+            robot.hAutoDriveEncoder("forward", 0.5f, 3 * robot.ANDYMARK_TICKS_PER_REV);*/
         } catch (InterruptedException err) {
             telemetry.addData("Error", "InterruptedException");
             telemetry.update();

@@ -37,7 +37,7 @@ public class Hardware
 
     public DcMotor arm                   = null;
     public DcMotor loader                = null;
-    public DcMotor capBallLifter         = null;
+    //public DcMotor capBallLifter         = null;
 
     public MotorPowerCalc motorPower     = new MotorPowerCalc();
 
@@ -75,7 +75,7 @@ public class Hardware
 
         arm             = hwMap.dcMotor.get("arm");
         loader          = hwMap.dcMotor.get("loader");
-        capBallLifter   = hwMap.dcMotor.get("capBallLifter");
+        //capBallLifter   = hwMap.dcMotor.get("capBallLifter");
 
         // Set all motors to zero power
         frontLeftMotor.setPower(0);
@@ -83,11 +83,16 @@ public class Hardware
         backLeftMotor.setPower(0);
         backRightMotor.setPower(0);
 
+        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
+        backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+        backRightMotor.setDirection(DcMotor.Direction.REVERSE);
+
         arm.setPower(0);
         loader.setPower(0);
 
         loader.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        capBallLifter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //capBallLifter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         touchSensor       = hwMap.touchSensor.get("sensor_touch");
         beaconColorSensor = hwMap.colorSensor.get("sensor_color_beacon");
@@ -110,7 +115,7 @@ public class Hardware
             backLeftMotor.setTargetPosition(pos);
             backRightMotor.setTargetPosition(-pos);
         } else if (dir.equals("right") || dir.equals("left")) {
-            frontLeftMotor.setTargetPosition(- pos);
+            frontLeftMotor.setTargetPosition(-pos);
             frontRightMotor.setTargetPosition(pos);
             backLeftMotor.setTargetPosition(pos);
             backRightMotor.setTargetPosition(-pos);
@@ -181,7 +186,7 @@ public class Hardware
     {
         double gamepad1LeftY = gamepad1.left_stick_x;
         double gamepad1LeftX = gamepad1.left_stick_y;
-        double gamepad1RightX = gamepad1.right_stick_x;
+        double gamepad1RightX = -gamepad1.right_stick_x;
 
         gamepad1LeftY = Math.pow((Math.tanh(gamepad1LeftY) / Math.tanh(1)), 3);
         gamepad1LeftX = Math.pow((Math.tanh(gamepad1LeftX) / Math.tanh(1)), 3);
@@ -208,6 +213,13 @@ public class Hardware
         arm.setPower(ARM_DOWN_POWER);
 
         waitForTick(WAIT);
+    }
+
+    public void AI()
+    {
+        //gain sentience here
+        //Hi mom, hi dad
+
     }
 
     public void fireArm(int curPos) throws InterruptedException {

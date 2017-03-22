@@ -55,7 +55,7 @@ public class AutoDriveEncoderParticleOnly extends LinearOpMode {
     /* Declare OpMode members. */
     Hardware robot = new Hardware();
 
-    final long WAIT             = 1000;
+    final long WAIT = 1000;
 
     private int curPos;
 
@@ -77,13 +77,12 @@ public class AutoDriveEncoderParticleOnly extends LinearOpMode {
 
         //robot.hAutoDriveEncoder("forward", 0.6f, 2 * ANDYMARK_TICKS_PER_REV);
 
-        robot.hAutoDriveEncoder("right", 0.6f, ANDYMARK_TICKS_PER_REV);
-        robot.hAutoDriveEncoder("left", 0.6f, ANDYMARK_TICKS_PER_REV);
-
+        /*robot.hAutoDriveEncoder("right", 0.6f, ANDYMARK_TICKS_PER_REV);
+        robot.hAutoDriveEncoder("left", 0.6f, ANDYMARK_TICKS_PER_REV);*/
 
 
         // hold down arm before firing
-        /*robot.holdDownArm(curPos);
+        robot.holdDownArm(curPos);
 
         // fire ball one
         robot.fireArm(curPos);
@@ -101,6 +100,6 @@ public class AutoDriveEncoderParticleOnly extends LinearOpMode {
 
             // fire ball two
             robot.fireArm(curPos);
-        }*/
+        }
     }
 }
